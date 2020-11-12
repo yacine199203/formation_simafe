@@ -1,0 +1,77 @@
+body{
+    font-family: 'Open Sans', sans-serif !important;
+    color: rgb(65, 65, 66);
+}
+
+/*********** NAVBAR STYLE ***********/
+
+.navbar-toggler{
+    outline: none !important;
+}
+
+.nav-link{
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.dropdown-item{
+    background-color: transparent !important;
+}
+
+.nav-link:hover,.dropdown-item:hover{
+    color: #007bff !important;
+}
+
+/*********** DASHBORD STYLE ***********/
+
+.dashbord-item{
+    border: 3px solid rgb(65, 65, 66);
+    border-radius: 10px;
+}
+
+.dashbord-item i{
+    font-size: 100px;
+}
+
+.dashbord-item a{
+    text-decoration: none;
+    color: rgb(65, 65, 66);
+}
+.dashbord-item:hover{
+    border: 3px solid #007bff;
+}
+.dashbord-item a:hover{
+    color: #007bff;
+}
+
+/*CATEGORY*/
+
+.category{
+    border: 1px solid rgb(65, 65, 66);
+    border-radius: 10px;
+}
+
+.category a{
+    text-decoration: none;
+    color: rgb(65, 65, 66);
+}
+
+.category a:hover{
+    color: #007bff;
+}
+
+.btnmdsup {
+	box-shadow:none ! important;
+	outline: none ! important ;
+	font-size: 18px;
+}
+
+.btnmdsup:hover{
+	color: #007bff;
+}
+
+.delete:hover{
+	color: red !important;
+}
+
+

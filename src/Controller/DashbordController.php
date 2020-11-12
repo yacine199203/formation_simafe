@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Sliders;
 use App\Entity\Category;
+use App\Form\SlidersType;
 use App\Form\CategoryType;
+use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +28,7 @@ class DashbordController extends AbstractController
         ]);
     }
 
-    /***************************************************************************************************/
+/***************************************************************************************************/
 
     /**
      * @Route("/dashbord/categorie", name="category")
@@ -122,6 +125,90 @@ class DashbordController extends AbstractController
             'categorys' => $categorys, //drop-down nos produits
         ]);
     }
+
+/***************************************************************************************************/
+
+    /**
+     * permet de voir la page des sliders
+     * @Route("/dashbord/sliders", name="sliders")
+     */
+    public function showSliders(CategoryRepository $categoryRepo,SlidersRepository $slidersRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+
+        $sliders = $slidersRepo->findAll();
+        return $this->render('/dashbord/showSliders.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+
+            'sliders' => $sliders,
+        ]);
+    }
+
+
+    /**
+     * permet d'ajouter un slider
+     * @Route("/dashbord/ajouter-slid", name="addSlid")
+     * @return Response
+     */
+    public function addSlid(CategoryRepository $categoryRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+
+        $addSlider = new Sliders();
+        $addSlidForm = $this->createForm(SlidersType::class,$addSlider);
+        $addSlidForm-> handleRequest($request);
+        if($addSlidForm->isSubmitted() && $addSlidForm->isValid()){
+            $file= $addSlider->getImage();
+            $fileName=  md5(uniqid()).'.'.$file->guessExtension();
+            if($file->guessExtension()!='png'){
+                $this->addFlash(
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }else{
+                $file->move($this->getParameter('upload_directory_png'),$fileName);
+                $addSlider->setImage($fileName);
+                $manager=$this->getDoctrine()->getManager();
+                $manager->persist($addSlider); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "Le slid a bien été ajouté "
+                );
+                return $this-> redirectToRoute('sliders');
+            } 
+        }
+        return $this->render('dashbord/addSlid.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+
+            'addSlidForm'=> $addSlidForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de supprimer un slid
+     * @Route("/dashbord/supprimer-slid/{image} ", name="removeSlid")
+     * @return Response
+     */
+    public function removeSlid($image,SlidersRepository $slidersRepo)
+    {   
+        $removeslid = $slidersRepo->findOneById($image);
+        $file= $removeslid->getImage();
+        unlink('../public/images/'.$file);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($removeslid); 
+        $manager->flush();
+        $this->addFlash(
+            'success',
+            "Le slid a bien été supprimé "
+        );
+        return $this-> redirectToRoute('sliders');
+        return $this->render('dashbord/index.html.twig', [
+            'sliders'=>$sliders
+        ]);
+    }
+
+/***************************************************************************************************/
 
 
 

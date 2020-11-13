@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Entity\Sliders;
 use App\Entity\Category;
+use App\Form\ProductType;
 use App\Form\SlidersType;
 use App\Form\CategoryType;
+use Cocur\Slugify\Slugify;
+use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -106,11 +110,20 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/supprimer-categorie/{categoryName} ", name="removeCategory")
      * @return Response
      */
-    public function removeCategory($categoryName,CategoryRepository $categoryRepo,Request $request)
+    public function removeCategory($categoryName,CategoryRepository $categoryRepo,ProductRepository $productRepo,Request $request)
     {   
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $products = $productRepo->findByCategory($categoryName);
         $removeCategory = $categoryRepo->findOneBySlug($categoryName);
+        foreach ($products as $productPng){
+            unlink('../public/images/'.$prod->getPng());
+        }
+        foreach ($products as $productImage){
+            unlink('../public/fiches-technique/'.$productImage->getImage());
+        }
+        foreach ($products as $productPdf){
+            unlink('../public/fiches-technique/'.$productPdf->getPdf());
+        }
         $manager=$this->getDoctrine()->getManager();
         $manager->remove($removeCategory); 
         $manager->flush();
@@ -122,7 +135,7 @@ class DashbordController extends AbstractController
          
         
         return $this->render('dashbord/editCategory.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
+            
         ]);
     }
 
@@ -204,11 +217,170 @@ class DashbordController extends AbstractController
         );
         return $this-> redirectToRoute('sliders');
         return $this->render('dashbord/index.html.twig', [
-            'sliders'=>$sliders
+            
         ]);
     }
 
 /***************************************************************************************************/
+
+    /**
+     * permet de voir la page des produits
+     * @Route("/dashbord/produits", name="products")
+     */
+    public function showProducts(CategoryRepository $categoryRepo,ProductRepository $productRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $products = $productRepo->findAll();
+        return $this->render('/dashbord/showProduct.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+
+            'products' => $products,
+        ]);
+    }
+
+    /**
+      * permet d'ajouter un produit
+     * @Route("/dashbord/ajouter-produit", name="addProduct")
+     * @return Response
+     */
+    public function addProduct(CategoryRepository $categoryRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $addProduct = new Product();
+        $addProdForm = $this->createForm(ProductType::class,$addProduct);
+        $addProdForm-> handleRequest($request);
+        if($addProdForm->isSubmitted() && $addProdForm->isValid()){
+            $slugify= new Slugify();
+            $filePng= $addProduct->getPng();
+            $filePdf= $addProduct->getPdf();
+            $fileImage= $addProduct->getImage();
+            $fileNamePng=  $slugify-> slugify($addProduct->getProductName()).'.'.$filePng->guessExtension();
+            $fileNamePdf=  $slugify-> slugify($addProduct->getProductName()).'.'.$filePdf->guessExtension();
+            $fileNameImage=  $slugify-> slugify($addProduct->getProductName()).'g.'.$fileImage->guessExtension();
+            if($filePng->guessExtension()!='png'||$fileImage->guessExtension()!='png'){
+                $this->addFlash(
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }elseif($filePdf->guessExtension()!='pdf')
+            {
+                $this->addFlash(
+                    'danger',
+                    "votre fichier doit être en format pdf "
+                );  
+            }else{
+                $filePng->move($this->getParameter('upload_directory_png'),$fileNamePng);
+                $fileImage->move($this->getParameter('upload_directory_png'),$fileNameImage);
+                $filePdf->move($this->getParameter('upload_directory_pdf'),$fileNamePdf);
+                $addProduct->setPng($fileNamePng);
+                $addProduct->setPdf($fileNamePdf);
+                $addProduct->setImage($fileNameImage);
+                $manager=$this->getDoctrine()->getManager();
+                foreach ($addProduct->getCharacteristics() as $chara){
+                    $chara->setProduct($addProduct);
+                    $manager->persist($chara);
+                }
+                $manager->persist($addProduct); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "Le produit ".$addProduct->getProductName()." a bien été ajouté "
+                );
+                return $this-> redirectToRoute('products');
+            } 
+        }
+        return $this->render('dashbord/addProduct.html.twig', [
+            'categorys'=> $categorys,//drop-down nos produits
+            'addProdForm'=> $addProdForm->createView(),
+            
+        ]);
+    }
+
+    /**
+     * permet de modifier un produit
+     * @Route("/dashbord/modifier-produit/{productName} ", name="editProduct")
+     * @return Response
+     */
+    public function editprod($productName,CategoryRepository $categoryRepo,ProductRepository $productRepo,Request $request)
+    {   $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $editProduct = $productRepo->findOneBySlug($productName);
+        $editProdForm = $this->createForm(ProductType::class,$editProduct);
+        $editProdForm-> handleRequest($request);
+        if($editProdForm->isSubmitted() && $editProdForm->isValid()){
+            $slugify= new Slugify();
+            $filePng= $editProduct->getPng();
+            $filePdf= $editProduct->getPdf();
+            $fileImage= $editProduct->getImage();
+            $fileNamePng=  $slugify-> slugify($editProduct->getProductName()).'.'.$filePng->guessExtension();
+            $fileNamePdf=  $slugify-> slugify($editProduct->getProductName()).'.'.$filePdf->guessExtension();
+            $fileNameImage=  $slugify-> slugify($editProduct->getProductName()).'g.'.$fileImage->guessExtension();
+            if($filePng->guessExtension()!='png'||$fileImage->guessExtension()!='png'){
+                $this->addFlash(
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }elseif($filePdf->guessExtension()!='pdf')
+            {
+                $this->addFlash(
+                    'danger',
+                    "votre fichier doit être en format pdf "
+                );  
+            }else{
+                $filePng->move($this->getParameter('upload_directory_png'),$fileNamePng);
+                $fileImage->move($this->getParameter('upload_directory_png'),$fileNameImage);
+                $filePdf->move($this->getParameter('upload_directory_pdf'),$fileNamePdf);
+                $editProduct->setPng($fileNamePng);
+                $editProduct->setPdf($fileNamePdf);
+                $editProduct->setImage($fileNameImage);
+                $manager=$this->getDoctrine()->getManager();
+                foreach ($editProduct->getCharacteristics() as $chara){
+                    $chara->setProduct($editProduct);
+                    $manager->persist($chara);
+                }
+                $manager->persist($editProduct); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "Le produit ".$editProduct->getProductName()." a bien été modifié "
+            );
+            return $this-> redirectToRoute('products');
+            } 
+        }
+        return $this->render('dashbord/editProduct.html.twig', [
+            'categorys'=> $categorys,//drop-down nos produits
+            'editProdForm'=>$editProdForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de supprimer un produit
+     * @Route("/dashbord/supprimer-produit/{image} ", name="removeProduct")
+     * @return Response
+     */
+    public function removeProduct($image,ProductRepository $productRepo)
+    {   
+        $removeProduct = $productRepo->findOneById($image);
+        $filePng= $removeProduct->getPng();
+        $fileImage= $removeProduct->getImage();
+        $filePdf= $removeProduct->getPdf();
+        unlink('../public/images/'.$filePng);
+        unlink('../public/images/'.$fileImage);
+        unlink('../public/fiches-technique/'.$filePdf);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($removeProduct); 
+        $manager->flush();
+        $this->addFlash(
+            'success',
+            "Le produit ".$removeProduct->getProductName()." a bien été supprimé "
+        );
+        return $this-> redirectToRoute('products');
+        
+        return $this->render('dashbord/index.html.twig', [
+            
+        ]);
+    }
+
+
 
 
 

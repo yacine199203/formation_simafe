@@ -3,6 +3,15 @@ body{
     color: rgb(65, 65, 66);
 }
 
+a{
+    text-decoration: none !important;
+    color: rgb(65, 65, 66);
+}
+
+a:hover{
+    color: #007bff !important;
+}
+
 /*********** NAVBAR STYLE ***********/
 
 .navbar-toggler{
@@ -33,15 +42,8 @@ body{
     font-size: 100px;
 }
 
-.dashbord-item a{
-    text-decoration: none;
-    color: rgb(65, 65, 66);
-}
 .dashbord-item:hover{
     border: 3px solid #007bff;
-}
-.dashbord-item a:hover{
-    color: #007bff;
 }
 
 /*CATEGORY*/
@@ -49,15 +51,6 @@ body{
 .category{
     border: 1px solid rgb(65, 65, 66);
     border-radius: 10px;
-}
-
-.category a{
-    text-decoration: none;
-    color: rgb(65, 65, 66);
-}
-
-.category a:hover{
-    color: #007bff;
 }
 
 .btnmdsup {

@@ -29,7 +29,7 @@
                             <button class="btn pr-0 btnmdsup"><i class="fas fa-edit"></i></button>
                         </a>
                         <a href="{{ path('removeCategory',{'categoryName': cat.slug}) }}"
-                           onclick="return confirm ('voulez vous vraiment supprimer {{cat.categoryName}} ?')">
+                           onclick="return confirm ('voulez vous vraiment supprimer {{cat.categoryName}} ? \ntous les produits inclus dans cette catégorie seront aussi supprimé')">
                             <button class="btn pr-0 btnmdsup delete"><i class="far fa-trash-alt"></i></button>
                         </a>
                     </div>

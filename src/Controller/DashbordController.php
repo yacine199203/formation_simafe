@@ -139,6 +139,8 @@ class DashbordController extends AbstractController
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $products = $productRepo->findByCategory($categoryName);
         $removeCategory = $categoryRepo->findOneBySlug($categoryName);
+        $file= $removeCategory->getImage();
+        unlink('../public/images/'.$file);
         foreach ($products as $productPng){
             unlink('../public/images/'.$prod->getPng());
         }

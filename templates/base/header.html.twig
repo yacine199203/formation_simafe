@@ -21,7 +21,7 @@
                 </a>
                 <div class="dropdown-menu mt-3 pr-5" aria-labelledby="navbarDropdown">
                     {% for category in categorys %}
-                    <a class="dropdown-item" href="">{{category.categoryName}}</a>
+                    <a class="dropdown-item" href=" {{path('categorys',{'slug': category.slug }) }} ">{{category.categoryName}}</a>
                     {% endfor %}
                 </div>
 

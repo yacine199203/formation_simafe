@@ -23,4 +23,27 @@ class HomePageController extends AbstractController
             'sliders' => $sliders,
         ]);
     }
+
+    /***************************************************************************************************/
+
+    /**
+     * @Route("/{slug}", name="categorys")
+     * 
+     * @return Response
+     */
+    public function show($slug,CategoryRepository $categoryRepo)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $category = $categoryRepo->findOneBySlug($slug);
+        return $this->render('categorysList.html.twig', [
+            'categorys' => $categorys,//drop-down nos produits
+            'category'=> $category,
+            
+        ]);
+    }
+
 }
+
+
+
+

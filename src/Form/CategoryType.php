@@ -6,6 +6,7 @@ use App\Entity\Category;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class CategoryType extends AbstractType
@@ -17,6 +18,14 @@ class CategoryType extends AbstractType
             'label'=>'Catégorie :',
             'attr'=>[
                 'placeholder'=>'Ex: Vitrines horizontales'
+            ]
+        ])
+        ->add('image',FileType::class,[
+            'label'=>'Image (uniquement en format png) :',
+            'data_class' => null,
+            'attr'=>[
+                'accept'=>'.png', 
+                'placeholder'=>'Ex: image.png', 
             ]
         ])
         ;

@@ -59,14 +59,26 @@ class DashbordController extends AbstractController
         $addCatForm-> handleRequest($request);
         if($addCatForm->isSubmitted() && $addCatForm->isValid())
         {
-            $manager=$this->getDoctrine()->getManager();
-                $manager->persist($addCategory); 
-                $manager->flush();
+            $file= $addCategory->getImage();
+            $fileName=  md5(uniqid()).'.'.$file->guessExtension();
+            if($file->guessExtension()!='png'){
                 $this->addFlash(
-                    'success',
-                    "La catégorie ".$addCategory->getCategoryName()." a bien été ajoutée "
-            );
-            return $this-> redirectToRoute('category');
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }else
+            {
+                    $file->move($this->getParameter('upload_directory_png'),$fileName);
+                    $addCategory->setImage($fileName);
+                    $manager=$this->getDoctrine()->getManager();
+                    $manager->persist($addCategory); 
+                    $manager->flush();
+                    $this->addFlash(
+                        'success',
+                        "La catégorie ".$addCategory->getCategoryName()." a bien été ajoutée "
+                );
+                return $this-> redirectToRoute('category');
+            }
         } 
         
         return $this->render('dashbord/addCategory.html.twig', [
@@ -89,14 +101,26 @@ class DashbordController extends AbstractController
         $editCatForm-> handleRequest($request);
         if($editCatForm->isSubmitted() && $editCatForm->isValid())
         {
-            $manager=$this->getDoctrine()->getManager();
-            $manager->persist($editCategory); 
-            $manager->flush();
-            $this->addFlash(
-                'success',
-                "La catégorie ".$editCategory->getCategoryName()." a bien été modifiée "
-            );
-            return $this-> redirectToRoute('category');
+            $file= $editCategory->getImage();
+            $fileName=  md5(uniqid()).'.'.$file->guessExtension();
+            if($file->guessExtension()!='png'){
+                $this->addFlash(
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }else
+            {
+                $file->move($this->getParameter('upload_directory_png'),$fileName);
+                $editCategory->setImage($fileName);
+                $manager=$this->getDoctrine()->getManager();
+                $manager->persist($editCategory); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "La catégorie ".$editCategory->getCategoryName()." a bien été modifiée "
+                );
+                return $this-> redirectToRoute('category');
+            }
         } 
         
         return $this->render('dashbord/editCategory.html.twig', [

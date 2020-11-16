@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Job;
+use App\Form\JobType;
 use App\Entity\Product;
 use App\Entity\Sliders;
 use App\Entity\Category;
@@ -9,6 +11,7 @@ use App\Form\ProductType;
 use App\Form\SlidersType;
 use App\Form\CategoryType;
 use Cocur\Slugify\Slugify;
+use App\Repository\JobRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
@@ -405,6 +408,136 @@ class DashbordController extends AbstractController
             
         ]);
     }
+
+/***************************************************************************************************/
+
+    /**
+     * @Route("/dashbord/metier", name="job")
+     */
+    public function showJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        return $this->render('/dashbord/showJob.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+        ]);
+    }
+
+    /**
+     * permet d'ajouter un métier 
+     * @Route("/dashbord/ajouter-metier", name="addJob")
+     * @return Response
+     */
+    public function addJob(CategoryRepository $categoryRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+
+        $addJob = new Job();
+        $addJobForm = $this->createForm(JobType::class,$addJob);
+        $addJobForm-> handleRequest($request);
+        if($addJobForm->isSubmitted() && $addJobForm->isValid())
+        {
+            $slugify= new Slugify();
+            $file= $addJob->getImage();
+            $fileName=  $slugify-> slugify($addJob->getJob()).'.'.$file->guessExtension();
+            if($file->guessExtension()!='png'){
+                $this->addFlash(
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }else
+            {
+                    $file->move($this->getParameter('upload_directory_png'),$fileName);
+                    $addJob->setImage($fileName);
+                    $manager=$this->getDoctrine()->getManager();
+                    $manager->persist($addJob); 
+                    $manager->flush();
+                    $this->addFlash(
+                        'success',
+                        "Le métier ".$addJob->getJob()." a bien été ajouté "
+                );
+                return $this-> redirectToRoute('job');
+            }
+        } 
+        
+        return $this->render('dashbord/addJob.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'addJobForm'=> $addJobForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de modifier un métier
+     * @Route("/dashbord/modifier-metier/{job} ", name="editJob")
+     * @return Response
+     */
+    public function editJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    {   
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+
+        $editJob = $jobRepo->findOneBySlug($job);
+        $editJobForm = $this->createForm(JobType::class,$editJob);
+        $editJobForm-> handleRequest($request);
+        if($editJobForm->isSubmitted() && $editJobForm->isValid())
+        {
+            $slugify= new Slugify();
+            $file= $editJob->getImage();
+            $fileName=  $slugify-> slugify($editJob->getJob()).'.'.$file->guessExtension();
+            if($file->guessExtension()!='png'){
+                $this->addFlash(
+                    'danger',
+                    "votre image doit être en format png "
+                );  
+            }else
+            {
+                $file->move($this->getParameter('upload_directory_png'),$fileName);
+                $editJob->setImage($fileName);
+                $manager=$this->getDoctrine()->getManager();
+                $manager->persist($editJob); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "Le métier ".$editJob->getJob()." a bien été modifié "
+                );
+                return $this-> redirectToRoute('job');
+            }
+        } 
+        
+        return $this->render('dashbord/editJob.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'editJobForm'=> $editJobForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de supprimer un métier
+     * @Route("/dashbord/supprimer-metier/{job} ", name="removeJob")
+     * @return Response
+     */
+    public function removeJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    {   
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+
+        $removeJob = $jobRepo->findOneBySlug($job);
+        $file= $removeJob->getImage();
+        unlink('../public/images/'.$file);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($removeJob); 
+        $manager->flush();
+            $this->addFlash(
+                'success',
+                "Le métier ".$removeJob->getJob()." a bien été supprimé "
+            );
+            return $this-> redirectToRoute('job');
+         
+        
+        return $this->render('dashbord/editJob.html.twig', [
+            
+        ]);
+    }
+
+/***************************************************************************************************/
 
 
 

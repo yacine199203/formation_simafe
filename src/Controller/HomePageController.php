@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\JobRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +14,16 @@ class HomePageController extends AbstractController
     /**
      * @Route("/", name="homePage")
      */
-    public function index(CategoryRepository $categoryRepo,SlidersRepository $slidersRepo): Response
+    public function index(CategoryRepository $categoryRepo,SlidersRepository $slidersRepo,JobRepository $jobRepo): Response
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
 
+        $jobs = $jobRepo->findAll();
         $sliders = $slidersRepo->findAll();
         return $this->render('home.html.twig', [
             'categorys' => $categorys,//drop-down nos produits
             'sliders' => $sliders,
+            'jobs' => $jobs,
         ]);
     }
 

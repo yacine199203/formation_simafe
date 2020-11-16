@@ -31,6 +31,28 @@
                 <span class="sr-only">Next</span>
             </a>
         </div>
+
+    {#*********************************** PRODUITS PAR MÉTIER ***********************************#}
+    
+    <div id="realisations" class="row justify-content-center my-5">
+        <h3 class="text-center">NOS PRODUITS PAR MÉTIER</h3>
+    </div>
+
+    <div class="row justify-content-between">
+        {% for jb in jobs %}
+        <div class="col-md-4 ">
+            <a href="#">
+                <div class="single-works">
+                    <img src="/images/{{jb.image}}">
+                    <div class="overlay-text">
+                        <br>
+                        <h5 class="title">{{jb.job}}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
     </div>
     
 {% endblock %}

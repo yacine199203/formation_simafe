@@ -2,11 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\JobProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\JobProductRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=JobProductRepository::class)
+ *  @UniqueEntity(
+ * fields={"job","product"},
+ * message="Cette relation existe déja"
+ * )
  */
 class JobProduct
 {
@@ -24,7 +30,8 @@ class JobProduct
     private $product;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\ManyToOne(targetEntity=Job::class, inversedBy="jobProducts")
+     * @Assert\NotBlank(message="Ce champ est vide")
      */
     private $job;
 
@@ -45,12 +52,12 @@ class JobProduct
         return $this;
     }
 
-    public function getJob()
+    public function getJob(): ?Job
     {
         return $this->job;
     }
 
-    public function setJob($job): self
+    public function setJob(?Job $job): self
     {
         $this->job = $job;
 

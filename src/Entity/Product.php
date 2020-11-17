@@ -8,6 +8,7 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -34,6 +35,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Ce champ est vide")
      */
     private $productName;
 
@@ -44,11 +46,13 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Ce champ est vide")
      */
     private $pdf;
 
     /**
      * @ORM\OneToMany(targetEntity=Characteristics::class, mappedBy="product", orphanRemoval=true)
+     * @Assert\Valid()
      */
     private $characteristics;
 
@@ -64,6 +68,7 @@ class Product
 
     /**
      * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="product", orphanRemoval=true)
+     * @Assert\Valid()
      */
     private $jobProducts;
 

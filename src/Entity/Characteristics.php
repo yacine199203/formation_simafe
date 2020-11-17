@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CharacteristicsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CharacteristicsRepository::class)
@@ -25,6 +26,7 @@ class Characteristics
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Ce champ est vide")
      */
     private $characteristics;
 

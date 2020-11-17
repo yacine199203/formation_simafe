@@ -41,6 +41,11 @@ class Job
      */
     private $image;
 
+    /**
+     * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="job")
+     */
+    private $jobProducts;
+
 
     public function __construct()
     {
@@ -100,6 +105,36 @@ class Job
     public function setImage($image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|JobProduct[]
+     */
+    public function getJobProducts(): Collection
+    {
+        return $this->jobProducts;
+    }
+
+    public function addJobProduct(JobProduct $jobProduct): self
+    {
+        if (!$this->jobProducts->contains($jobProduct)) {
+            $this->jobProducts[] = $jobProduct;
+            $jobProduct->setJob($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJobProduct(JobProduct $jobProduct): self
+    {
+        if ($this->jobProducts->removeElement($jobProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($jobProduct->getJob() === $this) {
+                $jobProduct->setJob(null);
+            }
+        }
 
         return $this;
     }

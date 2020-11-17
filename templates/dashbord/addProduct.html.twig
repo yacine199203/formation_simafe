@@ -43,7 +43,7 @@
         </div>
     </div>
 {% endblock %}
-
+ 
 {% block _product_characteristics_widget %}
     {{ form_widget(form) }}
     <input type="hidden" id="widgets-counter" value="0">
@@ -84,11 +84,6 @@
 {% endblock %}
 
 
-
-
-
-
-
 {% block javascripts %}
 
     <script type="text/javascript">
@@ -96,7 +91,7 @@
     </script>
 
     <script>
-
+  
         $('#add-cara').click(function(){
             // récupèrer le numéro du future champ à ajouter
             const index = +$('#widgets-counter').val();

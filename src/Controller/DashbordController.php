@@ -272,9 +272,10 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/ajouter-produit", name="addProduct")
      * @return Response
      */
-    public function addProduct(CategoryRepository $categoryRepo,Request $request)
+    public function addProduct(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
         $addProduct = new Product();
         $addProdForm = $this->createForm(ProductType::class,$addProduct);
         $addProdForm-> handleRequest($request);
@@ -324,6 +325,7 @@ class DashbordController extends AbstractController
         }
         return $this->render('dashbord/addProduct.html.twig', [
             'categorys'=> $categorys,//drop-down nos produits
+            'jobs'=> $jobs,//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
             'addProdForm'=> $addProdForm->createView(),
             
         ]);

@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Product;
+use App\Form\JobProductType;
 use App\Form\CharacteristicsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -62,6 +63,14 @@ class ProductType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
             ])
+            ->add('jobProducts',CollectionType::class,
+            [
+                'label'=>'Métier :',
+                'entry_type' => JobProductType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+            ])
+        ;
         ;
     }
 

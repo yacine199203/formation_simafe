@@ -54,6 +54,41 @@
     </div>
 {% endblock %}
 
+{% block _product_jobProducts_entry_row %}
+{{ form_widget(form) }}
+{% endblock %}
+
+{% block _product_jobProducts_entry_widget %}
+    <div class="form-group" id="block_{{ id }}">
+        <div class="row">
+            <div class="col-md-11 pr-0">
+                {{ form_widget (form.job)}}
+            </div>
+            <div class="col-md-1 p-0">
+                <button type="button" data-action="delete" data-target="#block_{{ id }}" class="btn pr-0 btnmdsup delete" style="font-size: 20px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _product_jobProducts_widget %}
+    {{ form_widget(form) }}
+    <input type="hidden" id="widgets-counterj" value="0">
+    <div class="form-group" >
+        <button id="add-jp" type="button" class="btn pr-0 btnmdsup" style="font-size: 20px;">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
 {% block javascripts %}
 
     <script type="text/javascript">
@@ -81,11 +116,40 @@
         }
 
         function updatecounter() {
-            const count = +$('#ad_images div.form-group').length;
+            const count = +$('#product_characteristics div.form-group').length;
             $('#widgets-counter').val(count);
         }
 
         updatecounter();
         handleDeleteButtons();
+    </script>
+
+    <script>
+
+        $('#add-jp').click(function(){
+            // récupèrer le numéro du future champ à ajouter
+            const indexj = +$('#widgets-counterj').val();
+            // récupèrer le prototype html généré par symfony voir inspecter code
+            const tmplj = $('#product_jobProducts').data('prototype').replace(/__name__/g,indexj);
+            //injecter le code 
+            $('#product_jobProducts').append(tmplj);
+            $('#widgets-counterj').val(indexj+1);
+            handleDeleteButtonsj();
+        });
+
+        function handleDeleteButtonsj() {
+            $('button[data-action="delete"]').click(function(){
+                const target = this.dataset.target;
+                $(target).remove();
+            });
+        }
+
+        function updatecounterj() {
+            const count = +$('#product_jobProducts div.form-group').length;
+            $('#widgets-counterj').val(count);
+        }
+
+        updatecounterj();
+        handleDeleteButtonsj();
     </script>
 {% endblock %}

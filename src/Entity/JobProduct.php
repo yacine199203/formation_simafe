@@ -18,41 +18,41 @@ class JobProduct
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Job::class, inversedBy="jobProducts")
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="jobProducts")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $job;
+    private $product;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
-    private $product;
+    private $job;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getJob(): ?Job
-    {
-        return $this->job;
-    }
-
-    public function setJob(?Job $job): self
-    {
-        $this->job = $job;
-
-        return $this;
-    }
-
-    public function getProduct(): ?int
+    public function getProduct(): ?Product
     {
         return $this->product;
     }
 
-    public function setProduct(int $product): self
+    public function setProduct(?Product $product): self
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getJob()
+    {
+        return $this->job;
+    }
+
+    public function setJob($job): self
+    {
+        $this->job = $job;
 
         return $this;
     }

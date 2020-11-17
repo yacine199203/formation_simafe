@@ -62,9 +62,15 @@ class Product
      */
     private $slug;
 
+    /**
+     * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="product", orphanRemoval=true)
+     */
+    private $jobProducts;
+
     public function __construct()
     {
         $this->characteristics = new ArrayCollection();
+        $this->jobProducts = new ArrayCollection();
     }
 
     /** 
@@ -182,6 +188,36 @@ class Product
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|JobProduct[]
+     */
+    public function getJobProducts(): Collection
+    {
+        return $this->jobProducts;
+    }
+
+    public function addJobProduct(JobProduct $jobProduct): self
+    {
+        if (!$this->jobProducts->contains($jobProduct)) {
+            $this->jobProducts[] = $jobProduct;
+            $jobProduct->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJobProduct(JobProduct $jobProduct): self
+    {
+        if ($this->jobProducts->removeElement($jobProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($jobProduct->getProduct() === $this) {
+                $jobProduct->setProduct(null);
+            }
+        }
 
         return $this;
     }

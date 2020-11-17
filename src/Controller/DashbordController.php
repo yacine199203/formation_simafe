@@ -309,6 +309,10 @@ class DashbordController extends AbstractController
                     $chara->setProduct($addProduct);
                     $manager->persist($chara);
                 }
+                foreach ($addProduct->getJobProducts() as $jp){
+                    $jp->setProduct($addProduct);
+                    $manager->persist($jp);
+                }
                 $manager->persist($addProduct); 
                 $manager->flush();
                 $this->addFlash(
@@ -365,6 +369,10 @@ class DashbordController extends AbstractController
                 foreach ($editProduct->getCharacteristics() as $chara){
                     $chara->setProduct($editProduct);
                     $manager->persist($chara);
+                }
+                foreach ($editProduct->getJobProducts() as $jp){
+                    $jp->setProduct($editProduct);
+                    $manager->persist($jp);
                 }
                 $manager->persist($editProduct); 
                 $manager->flush();

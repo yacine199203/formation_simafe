@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm ">
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow ">
 
     <a class="navbar-brand" href="{{path('homePage')}}"><img src="/images/logo.png" alt=""></a>
 
@@ -21,7 +21,7 @@
                 </a>
                 <div class="dropdown-menu mt-3 pr-5" aria-labelledby="navbarDropdown">
                     {% for category in categorys %}
-                    <a class="dropdown-item" href=" {{path('categorys',{'slug': category.slug }) }} ">{{category.categoryName}}</a>
+                    <a class="dropdown-item" href=" {{path('categoryproduct',{'slug': category.slug })}} ">{{category.categoryName}}</a>
                     {% endfor %}
                 </div>
 

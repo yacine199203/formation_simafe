@@ -204,7 +204,10 @@ class Product
     {
         return $this->jobProducts;
     }
-
+    public function __toString()
+{
+    return (string) $this->getJobProducts();
+}
     public function addJobProduct(JobProduct $jobProduct): self
     {
         if (!$this->jobProducts->contains($jobProduct)) {
@@ -226,4 +229,5 @@ class Product
 
         return $this;
     }
+    
 }

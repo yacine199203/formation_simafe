@@ -45,12 +45,14 @@ class JobProduct
         return $this->product;
     }
 
+    
     public function setProduct(?Product $product): self
     {
         $this->product = $product;
 
         return $this;
     }
+    
 
     public function getJob(): ?Job
     {

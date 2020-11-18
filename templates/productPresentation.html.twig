@@ -1,0 +1,42 @@
+{% extends "/model.html.twig" %}
+{% block title %}{{product.ProductName}}{% endblock %}
+
+{% block arbo %}
+
+<div>
+    <a href="{{ path('homePage') }}">Accueil</a> /
+    <a href="{{path('categoryproduct',{'slug': category.slug }) }}">{{category.categoryName}}</a> /
+    {{product.productName}}
+
+</div>
+
+{% endblock %}
+{% block mbody %}
+    <div class="row product-title mx-2">
+        <div class="col-12 pr-0 pl-2 py-3 ml-5">
+            <h4>{{category.categoryName|upper}}</h4>
+            <h5>{{product.productName|upper}}</h5>
+        </div>
+    </div>
+    <div class="row my-5 ">
+        <div class="col-12 text-center">
+            <img class="my-3" src="/images/{{ product.image }}" alt="{{ product.image }}">
+            <a href="/fiches-technique/{{ product.pdf }}" target="_blank">
+                <h5><i class="fas fa-file-pdf"></i> Telecharger la fiche technique</h5>
+            </a>
+        </div>
+    </div>
+
+    <h5 class="bg-primary p-2 rounded" style="width: 210px; color: white;">CARACTÉRISTIQUES :</h5>
+    <div class="border bg-light rounded my-4">
+        <ul class="py-3">
+            {% for chara in product.characteristics %}
+                <li class="my-2 ml-3">
+                    {{chara.characteristics}}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    
+{% endblock %}

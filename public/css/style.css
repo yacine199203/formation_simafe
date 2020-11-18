@@ -157,3 +157,17 @@ a:hover{
 }
 
 
+/*********** PRODUIT PRESENTATION ***********/
+
+.product-title{
+	background-color: tomato;
+}
+
+.product-title div{
+	background-color: white;
+}
+
+.product-title div h4 {
+	color: #007bff ;
+	font-weight: 800;
+}

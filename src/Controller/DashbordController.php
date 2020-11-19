@@ -26,12 +26,13 @@ class DashbordController extends AbstractController
     /**
      * @Route("/dashbord", name="dashbord")
      */
-    public function index(CategoryRepository $categoryRepo): Response
+    public function index(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         return $this->render('/dashbord/index.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
         ]);
     }
 
@@ -40,12 +41,13 @@ class DashbordController extends AbstractController
     /**
      * @Route("/dashbord/categorie", name="category")
      */
-    public function showCategory(CategoryRepository $categoryRepo): Response
+    public function showCategory(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         return $this->render('/dashbord/showCategory.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
         ]);
     }
 
@@ -54,9 +56,10 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/ajouter-categorie", name="addCategory")
      * @return Response
      */
-    public function addCategory(CategoryRepository $categoryRepo,Request $request)
+    public function addCategory(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
         $addCategory = new Category();
         $addCatForm = $this->createForm(CategoryType::class,$addCategory);
         $addCatForm-> handleRequest($request);
@@ -86,6 +89,7 @@ class DashbordController extends AbstractController
         
         return $this->render('dashbord/addCategory.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
             'addCatForm'=> $addCatForm->createView(),
         ]);
     }
@@ -95,10 +99,10 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/modifier-categorie/{categoryName} ", name="editCategory")
      * @return Response
      */
-    public function editCategory($categoryName,CategoryRepository $categoryRepo,Request $request)
+    public function editCategory($categoryName,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {   
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         $editCategory = $categoryRepo->findOneBySlug($categoryName);
         $editCatForm = $this->createForm(CategoryType::class,$editCategory);
         $editCatForm-> handleRequest($request);
@@ -128,6 +132,7 @@ class DashbordController extends AbstractController
         
         return $this->render('dashbord/editCategory.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
             'editCatForm'=> $editCatForm->createView(),
         ]);
     }
@@ -174,14 +179,14 @@ class DashbordController extends AbstractController
      * permet de voir la page des sliders
      * @Route("/dashbord/sliders", name="sliders")
      */
-    public function showSliders(CategoryRepository $categoryRepo,SlidersRepository $slidersRepo): Response
+    public function showSliders(CategoryRepository $categoryRepo,JobRepository $jobRepo,SlidersRepository $slidersRepo): Response
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         $sliders = $slidersRepo->findAll();
         return $this->render('/dashbord/showSliders.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
-
+            'jobs' => $jobs,
             'sliders' => $sliders,
         ]);
     }
@@ -192,10 +197,10 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/ajouter-slid", name="addSlid")
      * @return Response
      */
-    public function addSlid(CategoryRepository $categoryRepo,Request $request)
+    public function addSlid(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         $addSlider = new Sliders();
         $addSlidForm = $this->createForm(SlidersType::class,$addSlider);
         $addSlidForm-> handleRequest($request);
@@ -222,7 +227,7 @@ class DashbordController extends AbstractController
         }
         return $this->render('dashbord/addSlid.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
-
+            'jobs' => $jobs,
             'addSlidForm'=> $addSlidForm->createView(),
         ]);
     }
@@ -256,13 +261,14 @@ class DashbordController extends AbstractController
      * permet de voir la page des produits
      * @Route("/dashbord/produits", name="products")
      */
-    public function showProducts(CategoryRepository $categoryRepo,ProductRepository $productRepo): Response
+    public function showProducts(CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo): Response
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
         $products = $productRepo->findAll();
         return $this->render('/dashbord/showProduct.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
-
+            'jobs' => $jobs,
             'products' => $products,
         ]);
     }
@@ -336,8 +342,9 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/modifier-produit/{productName} ", name="editProduct")
      * @return Response
      */
-    public function editprod($productName,CategoryRepository $categoryRepo,ProductRepository $productRepo,Request $request)
+    public function editprod($productName,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo,Request $request)
     {   $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
         $editProduct = $productRepo->findOneBySlug($productName);
         $editProdForm = $this->createForm(ProductType::class,$editProduct);
         $editProdForm-> handleRequest($request);
@@ -387,6 +394,7 @@ class DashbordController extends AbstractController
         }
         return $this->render('dashbord/editProduct.html.twig', [
             'categorys'=> $categorys,//drop-down nos produits
+            'jobs'=> $jobs,
             'editProdForm'=>$editProdForm->createView(),
         ]);
     }
@@ -439,10 +447,10 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/ajouter-metier", name="addJob")
      * @return Response
      */
-    public function addJob(CategoryRepository $categoryRepo,Request $request)
+    public function addJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         $addJob = new Job();
         $addJobForm = $this->createForm(JobType::class,$addJob);
         $addJobForm-> handleRequest($request);
@@ -473,6 +481,7 @@ class DashbordController extends AbstractController
         
         return $this->render('dashbord/addJob.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
             'addJobForm'=> $addJobForm->createView(),
         ]);
     }
@@ -485,7 +494,7 @@ class DashbordController extends AbstractController
     public function editJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {   
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-
+        $jobs = $jobRepo->findAll();
         $editJob = $jobRepo->findOneBySlug($job);
         $editJobForm = $this->createForm(JobType::class,$editJob);
         $editJobForm-> handleRequest($request);
@@ -516,6 +525,7 @@ class DashbordController extends AbstractController
         
         return $this->render('dashbord/editJob.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
             'editJobForm'=> $editJobForm->createView(),
         ]);
     }

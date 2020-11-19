@@ -12,31 +12,85 @@
 
 {% endblock %}
 {% block mbody %}
-    <div class="row product-title mx-2">
-        <div class="col-12 pr-0 pl-2 py-3 ml-5">
-            <h4>{{category.categoryName|upper}}</h4>
-            <h5>{{product.productName|upper}}</h5>
+<div class="row product-title mx-2">
+    <div class="col-12 pr-0 pl-2 py-3 ml-5">
+        <h4>{{category.categoryName|upper}}</h4>
+        <h5>{{product.productName|upper}}</h5>
+    </div>
+</div>
+<div class="row my-5 ">
+    <div class="col-12">
+        <div class="mx-auto" style="max-width: 452px;">
+            <img class="my-3 w-100" src="/images/{{ product.image }}" alt="{{ product.image }}">
         </div>
+        <a href="/fiches-technique/{{ product.pdf }}" target="_blank">
+            <h5><i class="fas fa-file-pdf"></i> Telecharger la fiche technique</h5>
+        </a>
     </div>
-    <div class="row my-5 ">
-        <div class="col-12 text-center">
-            <img class="my-3" src="/images/{{ product.image }}" alt="{{ product.image }}">
-            <a href="/fiches-technique/{{ product.pdf }}" target="_blank">
-                <h5><i class="fas fa-file-pdf"></i> Telecharger la fiche technique</h5>
-            </a>
-        </div>
-    </div>
+</div>
 
-    <h5 class="bg-primary p-2 rounded" style="width: 210px; color: white;">CARACTÉRISTIQUES :</h5>
-    <div class="border bg-light rounded my-4">
-        <ul class="py-3">
-            {% for chara in product.characteristics %}
-                <li class="my-2 ml-3">
-                    {{chara.characteristics}}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+<h5 class="bg-primary p-2 rounded" style="width: 210px; color: white;">CARACTÉRISTIQUES :</h5>
+<div class="border bg-light rounded my-4">
+    <ul class="py-3">
+        {% for chara in product.characteristics %}
+        <li class="my-2 ml-3">
+            {{chara.characteristics}}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
-    
+<h5 class="bg-primary p-2 rounded" style="width: 205px; color: white;">Produits Similaires :</h5>
+
+<div class="owl-carousel owl-theme my-5">
+    {% for prdct in category.products  %}
+    {% if prdct.productName != product.productName %}
+    <div class="item">
+            <div class="w-100">
+                <div class="border shadow-sm rounded p-2 product text-center mx-auto" style="max-width: 235px;">
+                    <a href="{{path('productPresentation',{'slug': category.slug,'productSlug': prdct.slug})}}">
+                        <img style="width: 100%" src="/images/{{prdct.png}}" alt="">
+                    </a>
+                    <h6 class="mb-1" style="font-weight: 700">{{category.categoryName}}</h6>
+                    <div>
+                        <a
+                            href="{{path('productPresentation',{'slug': category.slug,'productSlug': prdct.slug})}}">{{ prdct.productName }}</a>
+                    </div>
+                    <a href="{{path('productPresentation',{'slug': category.slug,'productSlug': prdct.slug})}}">
+                        <button class="btn btn-primary py-1 my-2">En savoir plus</button>
+                    </a>
+                </div>
+            </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"
+    integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw=="
+    crossorigin="anonymous"></script>
+<script>
+    $('.owl-carousel').owlCarousel({
+        loop: true,
+        margin: 10,
+        nav: false,
+        autoplay: true,
+        autoplauTimeout: 1000,
+        responsive: {
+            0: {
+                items: 1
+            },
+            600: {
+                items: 2
+            },
+            1000: {
+                items: 3
+            }
+        }
+    })
+</script>
 {% endblock %}

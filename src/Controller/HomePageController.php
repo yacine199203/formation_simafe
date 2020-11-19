@@ -41,10 +41,11 @@ class HomePageController extends AbstractController
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $category = $categoryRepo->findOneBySlug($slug);
+        $jobs = $jobRepo->findAll();
         return $this->render('categoryProductList.html.twig', [
             'categorys' => $categorys,//drop-down nos produits
             'category'=> $category,
-            
+            'jobs' => $jobs,
         ]);
     }
 
@@ -55,15 +56,17 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function showProductPresentation($slug,$productSlug,CategoryRepository $categoryRepo,ProductRepository $productRepo)
+    public function showProductPresentation($slug,$productSlug,CategoryRepository $categoryRepo,ProductRepository $productRepo,JobRepository $jobRepo)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findOneBySlug($metier);
         $category = $categoryRepo->findOneBySlug($slug);
         $product=$productRepo->findOneBySlug($productSlug);
         return $this->render('productPresentation.html.twig', [
             'categorys' => $categorys,//drop-down nos produits
             'category'=> $category,
             'product'=> $product,
+            'jobs'=> $jobs,
         ]);
     }
 
@@ -76,12 +79,12 @@ class HomePageController extends AbstractController
     public function showJobProduct($metier,CategoryRepository $categoryRepo,JobRepository $jobRepo,JobProductRepository $jpRepo,ProductRepository $productRepo)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jbs = $jobRepo->findOneBySlug($metier);
+        $jobs = $jobRepo->findOneBySlug($metier);
         $jps = $jpRepo->findAll();
         $products =$productRepo->findAll();
         return $this->render('jobProductList.html.twig', [
             'categorys' => $categorys,//drop-down nos produits
-            'jbs'=> $jbs,
+            'jobs'=> $jobs,
             'jps'=> $jps,
             'products'=> $products,
             

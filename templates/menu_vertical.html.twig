@@ -23,8 +23,8 @@
                 <div id="h{{cat.id}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
                 <div class="card-body">
                     {% for product in cat.products %}
-                        <div>
-                            <a href="#">
+                        <div class="my-2">
+                            <a href="{{path('productPresentation',{'slug': product.category.slug,'productSlug': product.slug})}}">
                                 {{ product.productName }}
                             </a> 
                         </div>

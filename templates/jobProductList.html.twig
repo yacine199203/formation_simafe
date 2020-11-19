@@ -1,28 +1,28 @@
 {% extends "/model.html.twig" %}
-{% block title %}{{jbs.job|capitalize }}{% endblock %}
+{% block title %}{{jobs.job|capitalize }}{% endblock %}
 
 {% block arbo %}
 
 <div>
     <a href="{{ path('homePage') }}">Accueil</a> /
-    {{jbs.job|capitalize }}
+    {{jobs.job|capitalize }}
 </div>
 
 {% endblock %}
 {% block mbody %}
 <div class="mb-5 text-center">
-    <h1> {{jbs.job}} </h1>
+    <h1> {{jobs.job}} </h1>
 </div>
-{% if jbs.jobProducts|length == 1 %}
-        <div style="font-size: 15px;"> {{jbs.jobProducts|length}} produit</div>
+{% if jobs.jobProducts|length == 1 %}
+        <div style="font-size: 15px;"> {{jobs.jobProducts|length}} produit</div>
     {% else %}
-        <div style="font-size: 15px;"> {{jbs.jobProducts|length}} produits</div>
+        <div style="font-size: 15px;"> {{jobs.jobProducts|length}} produits</div>
     {% endif %}
 
     <div class="row">
         {% for prod in products %}
         {% for jp in prod.jobProducts %} 
-        {% if prod.id == jp.product.id and jbs.id == jp.job.id %}
+        {% if prod.id == jp.product.id and jobs.id == jp.job.id %}
             <div class="col-md-4 p-3">
                 <div class="border shadow-sm rounded p-2 product text-center">
                     <a href="{{path('productPresentation',{'slug': jp.product.category.slug,'productSlug': jp.product.slug})}}">
@@ -37,9 +37,7 @@
                     </a>
                 </div>
             </div>
-        
         {% endif %}
-            
         {% endfor %}
         {% endfor %}
         

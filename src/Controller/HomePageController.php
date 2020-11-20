@@ -37,7 +37,7 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function showCategoryProduct($slug,CategoryRepository $categoryRepo)
+    public function showCategoryProduct($slug,CategoryRepository $categoryRepo,JobRepository $jobRepo)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $category = $categoryRepo->findOneBySlug($slug);
@@ -59,7 +59,7 @@ class HomePageController extends AbstractController
     public function showProductPresentation($slug,$productSlug,CategoryRepository $categoryRepo,ProductRepository $productRepo,JobRepository $jobRepo)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findOneBySlug($metier);
+        $jobs = $jobRepo->findAll();
         $category = $categoryRepo->findOneBySlug($slug);
         $product=$productRepo->findOneBySlug($productSlug);
         return $this->render('productPresentation.html.twig', [

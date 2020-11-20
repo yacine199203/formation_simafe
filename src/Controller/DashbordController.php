@@ -11,6 +11,8 @@ use App\Form\ProductType;
 use App\Form\SlidersType;
 use App\Form\CategoryType;
 use Cocur\Slugify\Slugify;
+use App\Entity\ProductionJob;
+use App\Form\ProductionJobType;
 use App\Repository\JobRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
@@ -559,8 +561,72 @@ class DashbordController extends AbstractController
 
 /***************************************************************************************************/
 
+    /**
+     * @Route("/realisation ", name="productionJob")
+     */
+    public function showProductionJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+
+        return $this->render('/dashbord/showProductionJob.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+        ]);
+    }
 
 
+    /**
+     * permet d'ajouter une réalisation
+     * @Route("/dashbord/ajouter-realisation", name="addProductionJob")
+     * @return Response
+     */
+    public function addProductionJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $addProductionJob = new ProductionJob();
+        $addProductionJobForm = $this->createForm(ProductionJobType::class,$addProductionJob);
+        $addProductionJobForm-> handleRequest($request);
+        if($addProductionJobForm->isSubmitted() && $addProductionJobForm->isValid())
+        {
+            $manager=$this->getDoctrine()->getManager();
+            $index=0;
+            foreach ($addProductionJob->getProductionImages() as $chara)
+            {
+
+                $slugify= new Slugify();
+                $file= $chara->getImage();
+                $fileName=  $slugify-> slugify($addProductionJob->getCustomer().$index).'.'.$file->guessExtension();
+                $index+=1;
+                if($file->guessExtension()!='png'){
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }else
+                {
+                    $file->move($this->getParameter('upload_directory_png'),$fileName);
+                    $chara->setImage($fileName);
+                    $manager->persist($chara);
+                }
+            }
+
+            $manager->persist($addProductionJob); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                'L\'album photo de '.$addProductionJob->getCustomer()." a bien été ajouté à ".$addProductionJob->getJob()
+            );
+                return $this-> redirectToRoute('productionJob');
+        } 
+        
+        return $this->render('dashbord/addProductionJob.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'addProductionJobForm'=> $addProductionJobForm->createView(),
+        ]);
+    }
 
 
 

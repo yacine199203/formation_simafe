@@ -46,10 +46,16 @@ class Job
      */
     private $jobProducts;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ProductionJob::class, mappedBy="job")
+     */
+    private $productionJobs;
+
 
     public function __construct()
     {
         $this->jobProducts = new ArrayCollection();
+        $this->productionJobs = new ArrayCollection();
     }
 
     /** 
@@ -76,7 +82,7 @@ class Job
 
     public function setJob(string $job): self
     {
-        $this->job = mb_strtoupper(mb_strtolower($job, 'UTF-8'), 'UTF-8');;
+        $this->job = mb_strtoupper($job, 'UTF-8');
 
         return $this;
     }
@@ -133,6 +139,36 @@ class Job
             // set the owning side to null (unless already changed)
             if ($jobProduct->getJob() === $this) {
                 $jobProduct->setJob(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProductionJob[]
+     */
+    public function getProductionJobs(): Collection
+    {
+        return $this->productionJobs;
+    }
+
+    public function addProductionJob(ProductionJob $productionJob): self
+    {
+        if (!$this->productionJobs->contains($productionJob)) {
+            $this->productionJobs[] = $productionJob;
+            $productionJob->setJob($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductionJob(ProductionJob $productionJob): self
+    {
+        if ($this->productionJobs->removeElement($productionJob)) {
+            // set the owning side to null (unless already changed)
+            if ($productionJob->getJob() === $this) {
+                $productionJob->setJob(null);
             }
         }
 

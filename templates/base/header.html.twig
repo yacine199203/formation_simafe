@@ -34,7 +34,7 @@
                 </a>
                 <div class="dropdown-menu mt-3 pr-5" aria-labelledby="navbarDropdown">
                     {% for jb in jobs %}
-                    <a class="dropdown-item" href=" {{path('categoryproduct',{'slug': jb.slug })}} "> Agencement pour {{jb.job|capitalize}}</a>
+                    <a class="dropdown-item" href=" {{path('production',{'slug': jb.slug })}} "> Agencement pour {{jb.job|capitalize}}</a>
                     {% endfor %}
                 </div>
 

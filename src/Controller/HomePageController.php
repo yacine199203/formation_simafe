@@ -7,6 +7,7 @@ use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\JobProductRepository;
+use App\Repository\ProductionJobRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -88,6 +89,27 @@ class HomePageController extends AbstractController
             'jps'=> $jps,
             'products'=> $products,
             
+        ]);
+    }
+
+    /**
+     * permet de voir la réalisation
+     * @Route("/realisation/{slug}", name="production")
+     * 
+     * @return Response
+     */
+    public function showProduction($slug,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductionJobRepository $pjRepo)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $jb = $jobRepo->findOneBySlug($slug);;
+        
+        
+        return $this->render('production.html.twig', [
+            'categorys' => $categorys,//drop-down nos produits
+            'jb'=> $jb,
+            'jobs'=> $jobs,
+           
         ]);
     }
 

@@ -1,0 +1,56 @@
+{% extends "/model.html.twig" %}
+{% block title %}{{ "Nos réalisations pour " ~ jb.job|upper }}{% endblock %}
+
+{% block arbo %}
+
+<div>
+    <a href="{{ path('homePage') }}">Accueil</a> /
+    {{"Nos réalisations pour " ~ jb.job|capitalize }}
+</div>
+
+{% endblock %}
+{% block mbody %}
+<div class="mb-5 text-center">
+    <h1> {{jb.job}} </h1>
+</div>
+
+
+{% for imgs in jb.productionJobs %}
+<div class="col-12 p-2 border rounded mb-4">
+    <h3 class="my-3"> {{imgs.customer}} </h3>
+    <div id="carouselExampleIndicators_{{imgs.id}}" class="carousel slide shadow-lg mt-2 shadow-sm rounded border"
+        data-ride="carousel">
+        <ol class="carousel-indicators">
+            {% for img in imgs.productionImages %}
+            <li data-target="#carouselExampleIndicators_{{imgs.id}}" data-slide-to="{{loop.index0}}" {% if loop.first %}
+                class="active" {% endif %}></li>
+            {% endfor %}
+        </ol>
+        <div class="carousel-inner">
+            {% for img in imgs.productionImages %}
+            <div class="carousel-item {% if loop.first %} active {% endif %} ">
+                <img src="/images/{{img.image}}" class="d-block w-100" alt="{{img.image}}">
+            </div>
+            {% endfor %}
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators_{{imgs.id}}" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators_{{imgs.id}}" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript">
+    $('.carousel').carousel({
+      interval: 000
+    })
+  </script>
+{% endblock %}

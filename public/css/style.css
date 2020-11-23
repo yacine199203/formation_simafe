@@ -70,6 +70,10 @@ a:hover{
 
 /* CATEGORY PRODUCT LIST*/
 
+.product{
+	background-color: rgb(243, 243, 243);
+}
+
 .product:hover{
 	box-shadow:  -1px 1px 24px -6px rgba(0,0,0,0.23)! important;
 }

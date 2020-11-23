@@ -15,7 +15,8 @@ class SlidersType extends AbstractType
         $builder
         ->add('image',FileType::class,[
             'label'=>'image (uniquement en format png) :',
-            'data_class' => null,
+            'required' => false,
+            'mapped' => false,
             'attr'=>[
                 'accept'=>'.png', 
                 'placeholder'=>'Ex: image.png', 
@@ -23,7 +24,6 @@ class SlidersType extends AbstractType
         ])
         ;
     }
-
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

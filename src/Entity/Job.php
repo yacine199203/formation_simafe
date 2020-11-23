@@ -42,7 +42,7 @@ class Job
     private $image;
 
     /**
-     * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="job")
+     * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="job",orphanRemoval=true)
      */
     private $jobProducts;
 

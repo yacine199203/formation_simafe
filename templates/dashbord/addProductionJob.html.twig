@@ -18,65 +18,8 @@
     </div>
 {% endblock %}
 
-{% block _production_job_productionImages_entry_row %}
-{{ form_widget(form) }}
-{% endblock %}
-
-{% block _production_job_productionImages_entry_widget %}
-    <div class="form-group" id="block_{{ id }}">
-        <div class="row">
-            <div class="col-md-11 pr-0">
-                {{ form_widget (form.image)}}
-            </div>
-            <div class="col-md-1 p-0">
-                <button type="button" data-action="delete" data-target="#block_{{ id }}" class="btn pr-0 btnmdsup delete" style="font-size: 20px;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-{% endblock %}
- 
-{% block _production_job_productionImages_widget %}
-    {{ form_widget(form) }}
-    <input type="hidden" id="widgets-counter" value="0">
-    <div class="form-group" >
-        <button id="add-pi" type="button" class="btn pr-0 btnmdsup" style="font-size: 20px;">
-            <i class="fas fa-plus"></i>
-        </button>
-    </div>
-{% endblock %}
-
 {% block javascripts %}
     <script type="text/javascript">
         $("input[type=file]").change(function (e){$(this).next('.custom-file-label').text(e.target.files[0].name);});
-    </script>
-
-    <script>
-        $('#add-pi').click(function(){
-            // récupèrer le numéro du future champ à ajouter
-            const index = +$('#widgets-counter').val();
-            // récupèrer le prototype html généré par symfony voir inspecter code
-            const tmpl = $('#production_job_productionImages').data('prototype').replace(/__name__/g,index);
-            //injecter le code 
-            $('#production_job_productionImages').append(tmpl);
-            $('#widgets-counter').val(index+1);
-            handleDeleteButtons();
-        });
-
-        function handleDeleteButtons() {
-            $('button[data-action="delete"]').click(function(){
-                const target = this.dataset.target;
-                $(target).remove();
-            });
-        }
-
-        function updatecounter() {
-            const count = +$('#production_job_productionImages div.form-group').length;
-            $('#widgets-counter').val(count);
-        }
-
-        updatecounter();
-        handleDeleteButtons();
     </script>
 {% endblock %}

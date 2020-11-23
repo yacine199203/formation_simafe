@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
@@ -31,12 +32,17 @@ class ProductionJobType extends AbstractType
                 'expanded'=>false,
                 'multiple'=>false,
             ])
-            ->add('productionImages',CollectionType::class,
-            [
-                'label'=>'Images :',
-                'entry_type' => ProductionImageType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
+            ->add('image',FileType::class,[
+                'label'=>'Image (uniquement en format png) :',
+                'attr'=>[
+                    'accept'=>'.png', 
+                    'placeholder'=>'Ex: image.png', 
+                ],
+                'mapped'=> false,
+                'required'=> false,
+                'multiple'=> true,
+                
+
             ])
         ;
     }

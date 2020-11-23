@@ -22,7 +22,8 @@ class JobType extends AbstractType
             ])
             ->add('image',FileType::class,[
                 'label'=>'Image (uniquement en format png) :',
-                'data_class' => null,
+                'required' => false,
+                'mapped' => false,
                 'attr'=>[
                     'accept'=>'.png', 
                     'placeholder'=>'Ex: image.png', 

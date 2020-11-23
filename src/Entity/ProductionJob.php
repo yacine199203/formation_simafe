@@ -2,14 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductionJobRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ProductionJobRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductionJobRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class ProductionJob
 {
@@ -32,14 +34,31 @@ class ProductionJob
     private $job;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductionImage::class, mappedBy="customer")
+     * @ORM\OneToMany(targetEntity=ProductionImage::class, mappedBy="customer", orphanRemoval=true, cascade={"persist"})
      * @Assert\Valid()
      */
     private $productionImages;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $slug;
+
     public function __construct()
     {
         $this->productionImages = new ArrayCollection();
+    }
+
+    /** 
+    *@ORM\PrePersist
+    *@ORM\PreUpdate
+    *@return void 
+    */
+    public function intialSlug(){
+        if(empty($this->slug) || !empty($this->slug)){
+            $slugify= new Slugify();
+            $this->slug = $slugify->slugify($this->customer);
+        }
     }
 
     public function getId(): ?int
@@ -97,6 +116,18 @@ class ProductionJob
                 $productionImage->setCustomer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

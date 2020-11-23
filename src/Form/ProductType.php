@@ -25,8 +25,9 @@ class ProductType extends AbstractType
                 ]
             ])
             ->add('png',FileType::class,[
-                'label'=>'Image (uniquement en format png) :',
-                'data_class' => null,
+                'label'=>'Image de présentation (uniquement en format png) :',
+                'required' => false,
+                'mapped'=> false,
                 'attr'=>[
                     'accept'=>'.png', 
                     'placeholder'=>'Ex: image.png', 
@@ -34,7 +35,8 @@ class ProductType extends AbstractType
             ])
             ->add('pdf',FileType::class,[
                 'label'=>'Fiche téchnique (uniquement en format pdf) :',
-                'data_class' => null,
+                'required' => false,
+                'mapped'=> false,
                 'attr'=>[
                     'accept'=>'.pdf', 
                     'placeholder'=>'Ex: fichier.pdf', 
@@ -42,7 +44,8 @@ class ProductType extends AbstractType
             ])
             ->add('image',FileType::class,[
                 'label'=>'Image (uniquement en format png) :',
-                'data_class' => null,
+                'required' => false,
+                'mapped'=> false,
                 'attr'=>[
                     'accept'=>'.png', 
                     'placeholder'=>'Ex: image.png', 

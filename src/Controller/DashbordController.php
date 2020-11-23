@@ -12,14 +12,19 @@ use App\Form\SlidersType;
 use App\Form\CategoryType;
 use Cocur\Slugify\Slugify;
 use App\Entity\ProductionJob;
+use App\Entity\ProductionImage;
 use App\Form\ProductionJobType;
 use App\Repository\JobRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\ProductionJobRepository;
+use App\Repository\ProductionImageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DashbordController extends AbstractController
@@ -67,27 +72,31 @@ class DashbordController extends AbstractController
         $addCatForm-> handleRequest($request);
         if($addCatForm->isSubmitted() && $addCatForm->isValid())
         {
-            $file= $addCategory->getImage();
-            $fileName=  md5(uniqid()).'.'.$file->guessExtension();
-            if($file->guessExtension()!='png'){
-                $this->addFlash(
-                    'danger',
-                    "votre image doit être en format png "
-                );  
-            }else
+            $file= $addCatForm->get('image')->getData();
+            if($file != null)
             {
+                $fileName=  uniqid().'.'.$file->guessExtension();
+                if($file->guessExtension()!='png'){
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }else
+                {
                     $file->move($this->getParameter('upload_directory_png'),$fileName);
                     $addCategory->setImage($fileName);
-                    $manager=$this->getDoctrine()->getManager();
-                    $manager->persist($addCategory); 
-                    $manager->flush();
-                    $this->addFlash(
-                        'success',
-                        "La catégorie ".$addCategory->getCategoryName()." a bien été ajoutée "
-                );
-                return $this-> redirectToRoute('category');
+                }
             }
-        } 
+            $manager=$this->getDoctrine()->getManager();
+            $manager->persist($addCategory); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "La catégorie ".$addCategory->getCategoryName()." a bien été ajoutée "
+            );
+            return $this-> redirectToRoute('category');
+            
+        }
         
         return $this->render('dashbord/addCategory.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
@@ -110,28 +119,32 @@ class DashbordController extends AbstractController
         $editCatForm-> handleRequest($request);
         if($editCatForm->isSubmitted() && $editCatForm->isValid())
         {
-            $file= $editCategory->getImage();
-            $fileName=  md5(uniqid()).'.'.$file->guessExtension();
-            if($file->guessExtension()!='png'){
-                $this->addFlash(
-                    'danger',
-                    "votre image doit être en format png "
-                );  
-            }else
+            $file= $editCatForm->get('image')->getData();
+            if($file != null)
             {
-                $file->move($this->getParameter('upload_directory_png'),$fileName);
-                $editCategory->setImage($fileName);
-                $manager=$this->getDoctrine()->getManager();
-                $manager->persist($editCategory); 
-                $manager->flush();
-                $this->addFlash(
-                    'success',
-                    "La catégorie ".$editCategory->getCategoryName()." a bien été modifiée "
-                );
-                return $this-> redirectToRoute('category');
+                unlink('../public/images/'.$file);
+                $fileName=  uniqid().'.'.$file->guessExtension();
+                if($file->guessExtension()!='png'){
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }else
+                {
+                    $file->move($this->getParameter('upload_directory_png'),$fileName);
+                    $editCategory->setImage($fileName);
+                }
             }
-        } 
-        
+            $manager=$this->getDoctrine()->getManager();
+            $manager->persist($editCategory); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "La catégorie ".$editCategory->getCategoryName()." a bien été modifiée "
+            );
+            return $this-> redirectToRoute('category');
+            
+        }
         return $this->render('dashbord/editCategory.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
             'jobs' => $jobs,
@@ -144,13 +157,15 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/supprimer-categorie/{categoryName} ", name="removeCategory")
      * @return Response
      */
-    public function removeCategory($categoryName,CategoryRepository $categoryRepo,ProductRepository $productRepo,Request $request)
+    public function removeCategory($categoryName,CategoryRepository $categoryRepo,ProductRepository $productRepo)
     {   
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $products = $productRepo->findByCategory($categoryName);
         $removeCategory = $categoryRepo->findOneBySlug($categoryName);
         $file= $removeCategory->getImage();
-        unlink('../public/images/'.$file);
+        if($removeCategory->getImage() != null){
+            unlink('../public/images/'.$file);
+        }
         foreach ($products as $productPng){
             unlink('../public/images/'.$prod->getPng());
         }
@@ -168,8 +183,6 @@ class DashbordController extends AbstractController
                 "La catégorie ".$removeCategory->getCategoryName()." a bien été supprimée "
             );
             return $this-> redirectToRoute('category');
-         
-        
         return $this->render('dashbord/editCategory.html.twig', [
             
         ]);
@@ -206,26 +219,37 @@ class DashbordController extends AbstractController
         $addSlider = new Sliders();
         $addSlidForm = $this->createForm(SlidersType::class,$addSlider);
         $addSlidForm-> handleRequest($request);
-        if($addSlidForm->isSubmitted() && $addSlidForm->isValid()){
-            $file= $addSlider->getImage();
-            $fileName=  md5(uniqid()).'.'.$file->guessExtension();
-            if($file->guessExtension()!='png'){
+        if($addSlidForm->isSubmitted() && $addSlidForm->isValid())
+        {
+            
+            $file= $addSlidForm->get('image')->getData();
+            if($file == null)
+            {
                 $this->addFlash(
                     'danger',
-                    "votre image doit être en format png "
-                );  
-            }else{
-                $file->move($this->getParameter('upload_directory_png'),$fileName);
-                $addSlider->setImage($fileName);
-                $manager=$this->getDoctrine()->getManager();
-                $manager->persist($addSlider); 
-                $manager->flush();
-                $this->addFlash(
-                    'success',
-                    "Le slid a bien été ajouté "
+                    "Le champ Image est vide"
                 );
-                return $this-> redirectToRoute('sliders');
-            } 
+            }else
+            {
+                $fileName=  md5(uniqid()).'.'.$file->guessExtension();
+                if($file->guessExtension()!='png'){
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    );  
+                }else{
+                    $file->move($this->getParameter('upload_directory_png'),$fileName);
+                    $addSlider->setImage($fileName);
+                    $manager=$this->getDoctrine()->getManager();
+                    $manager->persist($addSlider); 
+                    $manager->flush();
+                    $this->addFlash(
+                        'success',
+                        "Le slid a bien été ajouté "
+                    );
+                    return $this-> redirectToRoute('sliders');
+                } 
+            }
         }
         return $this->render('dashbord/addSlid.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
@@ -287,38 +311,67 @@ class DashbordController extends AbstractController
         $addProduct = new Product();
         $addProdForm = $this->createForm(ProductType::class,$addProduct);
         $addProdForm-> handleRequest($request);
-        if($addProdForm->isSubmitted() && $addProdForm->isValid()){
-            $slugify= new Slugify();
-            $filePng= $addProduct->getPng();
-            $filePdf= $addProduct->getPdf();
-            $fileImage= $addProduct->getImage();
-            $fileNamePng=  $slugify-> slugify($addProduct->getProductName()).'.'.$filePng->guessExtension();
-            $fileNamePdf=  $slugify-> slugify($addProduct->getProductName()).'.'.$filePdf->guessExtension();
-            $fileNameImage=  $slugify-> slugify($addProduct->getProductName()).'g.'.$fileImage->guessExtension();
-            if($filePng->guessExtension()!='png'||$fileImage->guessExtension()!='png'){
-                $this->addFlash(
-                    'danger',
-                    "votre image doit être en format png "
-                );  
-            }elseif($filePdf->guessExtension()!='pdf')
+        if($addProdForm->isSubmitted() && $addProdForm->isValid())
+        {
+            
+            $filePng= $addProdForm->get('png')->getData();
+            $filePdf= $addProdForm->get('pdf')->getData();
+            $fileImage= $addProdForm->get('image')->getData();
+            if($filePng == null)
             {
                 $this->addFlash(
                     'danger',
-                    "votre fichier doit être en format pdf "
-                );  
-            }else{
+                    "Le champ Image de présentation est vide \n"
+                );
+            }
+            elseif($filePdf == null)
+            {
+                $this->addFlash(
+                    'danger',
+                    "Le champ Fiche téchnique est vide \n"
+                );
+            }
+            elseif($fileImage == null)
+            {
+                $this->addFlash(
+                    'danger',
+                    "Le champ Image est vide \n"
+                );
+            }
+            else
+            {
+                $fileNamePng=  uniqid().'.'.$filePng->guessExtension();
+                $fileNamePdf=  uniqid().'.'.$filePdf->guessExtension();
+                $fileNameImage=  uniqid().'.'.$fileImage->guessExtension();
+                if($filePng->guessExtension()!='png' || $fileImage->guessExtension()!='png' )
+                {
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }elseif($filePdf->guessExtension()!='pdf')
+                {
+                    $this->addFlash(
+                        'danger',
+                        "votre fichier doit être en format pdf "
+                    );   
+                }
                 $filePng->move($this->getParameter('upload_directory_png'),$fileNamePng);
-                $fileImage->move($this->getParameter('upload_directory_png'),$fileNameImage);
                 $filePdf->move($this->getParameter('upload_directory_pdf'),$fileNamePdf);
+                $fileImage->move($this->getParameter('upload_directory_png'),$fileNameImage);
                 $addProduct->setPng($fileNamePng);
                 $addProduct->setPdf($fileNamePdf);
                 $addProduct->setImage($fileNameImage);
+            
+
                 $manager=$this->getDoctrine()->getManager();
-                foreach ($addProduct->getCharacteristics() as $chara){
+                foreach ($addProduct->getCharacteristics() as $chara)
+                {
                     $chara->setProduct($addProduct);
                     $manager->persist($chara);
                 }
-                foreach ($addProduct->getJobProducts() as $jp){
+                foreach ($addProduct->getJobProducts() as $jp)
+                {
                     $jp->setProduct($addProduct);
                     $manager->persist($jp);
                 }
@@ -350,54 +403,84 @@ class DashbordController extends AbstractController
         $editProduct = $productRepo->findOneBySlug($productName);
         $editProdForm = $this->createForm(ProductType::class,$editProduct);
         $editProdForm-> handleRequest($request);
-        if($editProdForm->isSubmitted() && $editProdForm->isValid()){
-            $slugify= new Slugify();
-            $filePng= $editProduct->getPng();
-            $filePdf= $editProduct->getPdf();
-            $fileImage= $editProduct->getImage();
-            $fileNamePng=  $slugify-> slugify($editProduct->getProductName()).'.'.$filePng->guessExtension();
-            $fileNamePdf=  $slugify-> slugify($editProduct->getProductName()).'.'.$filePdf->guessExtension();
-            $fileNameImage=  $slugify-> slugify($editProduct->getProductName()).'g.'.$fileImage->guessExtension();
-            if($filePng->guessExtension()!='png'||$fileImage->guessExtension()!='png'){
-                $this->addFlash(
-                    'danger',
-                    "votre image doit être en format png "
-                );  
-            }elseif($filePdf->guessExtension()!='pdf')
+        if($editProdForm->isSubmitted() && $editProdForm->isValid())
+        {
+            $filePng= $editProdForm->get('png')->getData();
+            $filePdf= $editProdForm->get('pdf')->getData();
+            $fileImage= $editProdForm->get('image')->getData();
+            if($filePng != null)
             {
-                $this->addFlash(
-                    'danger',
-                    "votre fichier doit être en format pdf "
-                );  
-            }else{
-                $filePng->move($this->getParameter('upload_directory_png'),$fileNamePng);
-                $fileImage->move($this->getParameter('upload_directory_png'),$fileNameImage);
-                $filePdf->move($this->getParameter('upload_directory_pdf'),$fileNamePdf);
-                $editProduct->setPng($fileNamePng);
-                $editProduct->setPdf($fileNamePdf);
-                $editProduct->setImage($fileNameImage);
-                $manager=$this->getDoctrine()->getManager();
-                foreach ($editProduct->getCharacteristics() as $chara){
-                    $chara->setProduct($editProduct);
-                    $manager->persist($chara);
+                if($filePng->guessExtension()!='png')
+                {
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    );
+                }else
+                {
+                    unlink('../public/images/'.$editProduct->getPng());
+                    $fileNamePng=  uniqid().'.'.$filePng->guessExtension();
+                    $filePng->move($this->getParameter('upload_directory_png'),$fileNamePng);
+                    $editProduct->setPng($fileNamePng);
+                }    
+            }if($filePdf != null)
+            {
+                if($filePdf->guessExtension()!='pdf')
+                {
+                    $this->addFlash(
+                        'danger',
+                        "votre fichier doit être en format pdf "
+                    );   
+                }else
+                {
+                    unlink('../public/fiches-technique/'.$editProduct->getPdf());
+                    $fileNamePdf=  uniqid().'.'.$filePdf->guessExtension();
+                    $filePdf->move($this->getParameter('upload_directory_pdf'),$fileNamePdf);
+                    $editProduct->setPdf($fileNamePdf);
                 }
-                foreach ($editProduct->getJobProducts() as $jp){
-                    $jp->setProduct($editProduct);
-                    $manager->persist($jp);
+            }if($fileImage != null)
+            {
+                if($fileImage->guessExtension()!='png' )
+                {
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }else
+                {
+                    unlink('../public/images/'.$editProduct->getImage());
+                    $fileNameImage=  uniqid().'.'.$fileImage->guessExtension();
+                    $fileImage->move($this->getParameter('upload_directory_png'),$fileNameImage);
+                    $editProduct->setImage($fileNameImage);
                 }
-                $manager->persist($editProduct); 
-                $manager->flush();
-                $this->addFlash(
-                    'success',
-                    "Le produit ".$editProduct->getProductName()." a bien été modifié "
+            }
+            
+
+            $manager=$this->getDoctrine()->getManager();
+            foreach ($editProduct->getCharacteristics() as $chara)
+            {
+                $chara->setProduct($editProduct);
+                $manager->persist($chara);
+            }
+            foreach ($editProduct->getJobProducts() as $jp)
+            {
+                $jp->setProduct($editProduct);
+                $manager->persist($jp);
+            }
+            $manager->persist($editProduct); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "Le produit ".$editProduct->getProductName()." a bien été modifié "
             );
             return $this-> redirectToRoute('products');
-            } 
+             
         }
         return $this->render('dashbord/editProduct.html.twig', [
             'categorys'=> $categorys,//drop-down nos produits
-            'jobs'=> $jobs,
-            'editProdForm'=>$editProdForm->createView(),
+            'jobs'=> $jobs,//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
+            'editProdForm'=> $editProdForm->createView(),
+            
         ]);
     }
 
@@ -412,9 +495,16 @@ class DashbordController extends AbstractController
         $filePng= $removeProduct->getPng();
         $fileImage= $removeProduct->getImage();
         $filePdf= $removeProduct->getPdf();
-        unlink('../public/images/'.$filePng);
-        unlink('../public/images/'.$fileImage);
-        unlink('../public/fiches-technique/'.$filePdf);
+        if($removeProduct->getPng() != null){
+            unlink('../public/images/'.$removeProduct->getPng());
+            
+        }
+        if($removeProduct->getPdf() != null){
+            unlink('../public/fiches-technique/'.$removeProduct->getPdf());
+        }
+        if($removeProduct->getImage() != null){
+            unlink('../public/images/'.$removeProduct->getImage());
+        }
         $manager=$this->getDoctrine()->getManager();
         $manager->remove($removeProduct); 
         $manager->flush();
@@ -458,28 +548,38 @@ class DashbordController extends AbstractController
         $addJobForm-> handleRequest($request);
         if($addJobForm->isSubmitted() && $addJobForm->isValid())
         {
-            $slugify= new Slugify();
-            $file= $addJob->getImage();
-            $fileName=  $slugify-> slugify($addJob->getJob()).'.'.$file->guessExtension();
-            if($file->guessExtension()!='png'){
+            $file= $addJobForm->get('image')->getData();
+            if($file == null)
+            {
                 $this->addFlash(
                     'danger',
-                    "votre image doit être en format png "
-                );  
+                    "Le champ Image est vide"
+                ); 
             }else
             {
-                    $file->move($this->getParameter('upload_directory_png'),$fileName);
-                    $addJob->setImage($fileName);
-                    $manager=$this->getDoctrine()->getManager();
-                    $manager->persist($addJob); 
-                    $manager->flush();
-                    $this->addFlash(
-                        'success',
-                        "Le métier ".$addJob->getJob()." a bien été ajouté "
+                    $fileName=  uniqid().'.'.$file->guessExtension();
+                    if($file->guessExtension()!='png'){
+                        $this->addFlash(
+                            'danger',
+                            "votre image doit être en format png "
+                        ); 
+                    }else
+                    {
+                        $file->move($this->getParameter('upload_directory_png'),$fileName);
+                        $addJob->setImage($fileName);
+                    }
+                
+                $manager=$this->getDoctrine()->getManager();
+                $manager->persist($addJob); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "Le métier ".$addJob->getJob()." a bien été ajouté "
                 );
                 return $this-> redirectToRoute('job');
-            }
-        } 
+            }    
+        }
+    
         
         return $this->render('dashbord/addJob.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
@@ -502,18 +602,23 @@ class DashbordController extends AbstractController
         $editJobForm-> handleRequest($request);
         if($editJobForm->isSubmitted() && $editJobForm->isValid())
         {
-            $slugify= new Slugify();
-            $file= $editJob->getImage();
-            $fileName=  $slugify-> slugify($editJob->getJob()).'.'.$file->guessExtension();
-            if($file->guessExtension()!='png'){
-                $this->addFlash(
-                    'danger',
-                    "votre image doit être en format png "
-                );  
-            }else
+            $file= $editJobForm->get('image')->getData();
+            if($file != null)
             {
-                $file->move($this->getParameter('upload_directory_png'),$fileName);
-                $editJob->setImage($fileName);
+                unlink('../public/images/'.$editJob->getImage());
+                $fileName=  uniqid().'.'.$file->guessExtension();
+                if($file->guessExtension()!='png')
+                {
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }else
+                    {
+                        $file->move($this->getParameter('upload_directory_png'),$fileName);
+                        $editJob->setImage($fileName);
+                    }           
+            }
                 $manager=$this->getDoctrine()->getManager();
                 $manager->persist($editJob); 
                 $manager->flush();
@@ -522,8 +627,9 @@ class DashbordController extends AbstractController
                     "Le métier ".$editJob->getJob()." a bien été modifié "
                 );
                 return $this-> redirectToRoute('job');
-            }
-        } 
+                
+        }
+    
         
         return $this->render('dashbord/editJob.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
@@ -590,35 +696,39 @@ class DashbordController extends AbstractController
         $addProductionJobForm-> handleRequest($request);
         if($addProductionJobForm->isSubmitted() && $addProductionJobForm->isValid())
         {
-            $manager=$this->getDoctrine()->getManager();
-            $index=0;
-            foreach ($addProductionJob->getProductionImages() as $chara)
+            $imgs= $addProductionJobForm->get('image')->getData();
+            if($imgs == null)
             {
-
-                $slugify= new Slugify();
-                $file= $chara->getImage();
-                $fileName=  $slugify-> slugify($addProductionJob->getCustomer().$index).'.'.$file->guessExtension();
-                $index+=1;
-                if($file->guessExtension()!='png'){
-                    $this->addFlash(
-                        'danger',
-                        "votre image doit être en format png "
-                    ); 
-                }else
-                {
-                    $file->move($this->getParameter('upload_directory_png'),$fileName);
-                    $chara->setImage($fileName);
-                    $manager->persist($chara);
+                $this->addFlash(
+                    'danger',
+                    "Le champ Image est vide "
+                ); 
+            }else
+            {
+                foreach($imgs as $img){
+                    $fileName=  uniqid().'.'.$img->guessExtension();
+                    if($img->guessExtension()!='png'){
+                        $this->addFlash(
+                            'danger',
+                            "votre image doit être en format png "
+                        ); 
+                    }else
+                    {
+                        $img->move($this->getParameter('upload_directory_png'),$fileName);
+                        $pi= new ProductionImage();
+                        $pi->setImage($fileName);
+                        $addProductionJob->addProductionImage($pi);
+                    }
                 }
+                $manager=$this->getDoctrine()->getManager();
+                $manager->persist($addProductionJob); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    'L\'album photo de '.$addProductionJob->getCustomer()." a bien été ajouté à ".$addProductionJob->getJob()
+                );
+                    return $this-> redirectToRoute('productionJob');
             }
-
-            $manager->persist($addProductionJob); 
-            $manager->flush();
-            $this->addFlash(
-                'success',
-                'L\'album photo de '.$addProductionJob->getCustomer()." a bien été ajouté à ".$addProductionJob->getJob()
-            );
-                return $this-> redirectToRoute('productionJob');
         } 
         
         return $this->render('dashbord/addProductionJob.html.twig', [
@@ -628,6 +738,107 @@ class DashbordController extends AbstractController
         ]);
     }
 
+
+    /**
+     * permet de modifier une réalisation
+     * @Route("/dashbord/modifier-realisation/{slug}", name="editProductionJob")
+     * @return Response
+     */
+    public function editProductionJob($slug,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductionJobRepository $productionJobRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $editProductionJob = $productionJobRepo->findOneBySlug($slug);
+        $editProductionJobForm = $this->createForm(ProductionJobType::class,$editProductionJob);
+        $editProductionJobForm-> handleRequest($request);
+        if($editProductionJobForm->isSubmitted() && $editProductionJobForm->isValid())
+        {
+            $imgs= $editProductionJobForm->get('image')->getData();
+            foreach($imgs as $img){
+                $fileName=  uniqid().'.'.$img->guessExtension();
+                if($img->guessExtension()!='png'){
+                    $this->addFlash(
+                        'danger',
+                        "votre image doit être en format png "
+                    ); 
+                }else
+                {
+                    $img->move($this->getParameter('upload_directory_png'),$fileName);
+                    $pi= new ProductionImage();
+                    $pi->setImage($fileName);
+                    $editProductionJob->addProductionImage($pi);
+                }
+            }
+            $manager=$this->getDoctrine()->getManager();
+            $manager->persist($editProductionJob); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                'L\'album photo de '.$editProductionJob->getCustomer()." a été modifié à ".$editProductionJob->getJob()
+            );
+                return $this-> redirectToRoute('productionJob');
+        } 
+        
+        return $this->render('dashbord/editProductionJob.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'editProductionJob' => $editProductionJob,
+            'editProductionJobForm'=> $editProductionJobForm->createView(),
+        ]);
+    }
+
+   
+
+    /**
+     * @Route("/supprime/image/{id}", name="annonces_delete_image", methods={"DELETE"})
+     */
+    public function deleteImage(ProductionImage $image, Request $request){
+        $data = json_decode($request->getContent(), true);
+
+        // On vérifie si le token est valide
+        if($this->isCsrfTokenValid('delete'.$image->getId(), $data['_token'])){
+            // On récupère le nom de l'image
+            $nom = $image->getImage();
+            // On supprime le fichier
+            unlink($this->getParameter('upload_directory_png').'/'.$nom);
+
+            // On supprime l'entrée de la base
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($image);
+            $em->flush();
+
+            // On répond en json
+            return new JsonResponse(['success' => 1]);
+        }else{
+            return new JsonResponse(['error' => 'Token Invalide'], 400);
+        }
+    }
+
+    /**
+     * permet de supprimer une catégorie
+     * @Route("/dashbord/supprimer-Pj/{id} ", name="removeProductionJob")
+     * @return Response
+     */
+    public function removeProductionJob($id,ProductionJobRepository $productionJobRepo)
+    {   
+        $removePj = $productionJobRepo->findOneById($id);
+        $rpjs= $removePj->getProductionImages();
+        foreach ($rpjs as $rpj){
+            unlink('../public/images/'.$rpj->getImage());
+        }
+        
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($removePj); 
+        $manager->flush();
+            $this->addFlash(
+                'success',
+                "L'album photo ".$removePj->getCustomer()." a bien été supprimé"
+            );
+            return $this-> redirectToRoute('productionJob');
+        return $this->render('dashbord/showProductionJob.html.twig', [
+            
+        ]);
+    }
 
 
 

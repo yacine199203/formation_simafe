@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\CallbackTransformer;
 
 class CategoryType extends AbstractType
 {
@@ -22,13 +23,15 @@ class CategoryType extends AbstractType
         ])
         ->add('image',FileType::class,[
             'label'=>'Image (uniquement en format png) :',
-            'data_class' => null,
+            'mapped'=> false,
             'attr'=>[
                 'accept'=>'.png', 
                 'placeholder'=>'Ex: image.png', 
-            ]
+            ],
+            'required'=> false,
         ])
         ;
+
     }
 
     public function configureOptions(OptionsResolver $resolver)

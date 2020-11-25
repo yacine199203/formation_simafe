@@ -3,18 +3,24 @@
 namespace App\Controller;
 
 use App\Entity\Job;
+use App\Entity\User;
 use App\Form\JobType;
+use App\Form\UserType;
 use App\Entity\Product;
 use App\Entity\Sliders;
 use App\Entity\Category;
 use App\Form\ProductType;
 use App\Form\SlidersType;
+use App\Entity\UpdatePass;
 use App\Form\CategoryType;
+use App\Form\EditUserType;
 use Cocur\Slugify\Slugify;
+use App\Form\UpdatePassType;
 use App\Entity\ProductionJob;
 use App\Entity\ProductionImage;
 use App\Form\ProductionJobType;
 use App\Repository\JobRepository;
+use App\Repository\UserRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
@@ -25,13 +31,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class DashbordController extends AbstractController
 {
 
     /**
      * @Route("/dashbord", name="dashbord")
+     * @IsGranted("ROLE_USER")
      */
     public function index(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -47,6 +56,7 @@ class DashbordController extends AbstractController
 
     /**
      * @Route("/dashbord/categorie", name="category")
+     * @IsGranted("ROLE_USER")
      */
     public function showCategory(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -61,6 +71,7 @@ class DashbordController extends AbstractController
     /**
      * permet d'ajouter une catégorie 
      * @Route("/dashbord/ajouter-categorie", name="addCategory")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function addCategory(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -108,6 +119,7 @@ class DashbordController extends AbstractController
     /**
      * permet de modifier une catégorie
      * @Route("/dashbord/modifier-categorie/{categoryName} ", name="editCategory")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function editCategory($categoryName,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -155,6 +167,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer une catégorie
      * @Route("/dashbord/supprimer-categorie/{categoryName} ", name="removeCategory")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function removeCategory($categoryName,CategoryRepository $categoryRepo,ProductRepository $productRepo)
@@ -193,6 +206,7 @@ class DashbordController extends AbstractController
     /**
      * permet de voir la page des sliders
      * @Route("/dashbord/sliders", name="sliders")
+     * @IsGranted("ROLE_USER")
      */
     public function showSliders(CategoryRepository $categoryRepo,JobRepository $jobRepo,SlidersRepository $slidersRepo): Response
     {
@@ -210,6 +224,7 @@ class DashbordController extends AbstractController
     /**
      * permet d'ajouter un slider
      * @Route("/dashbord/ajouter-slid", name="addSlid")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function addSlid(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -261,6 +276,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer un slid
      * @Route("/dashbord/supprimer-slid/{image} ", name="removeSlid")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function removeSlid($image,SlidersRepository $slidersRepo)
@@ -286,6 +302,7 @@ class DashbordController extends AbstractController
     /**
      * permet de voir la page des produits
      * @Route("/dashbord/produits", name="products")
+     * @IsGranted("ROLE_USER")
      */
     public function showProducts(CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo): Response
     {
@@ -302,6 +319,7 @@ class DashbordController extends AbstractController
     /**
       * permet d'ajouter un produit
      * @Route("/dashbord/ajouter-produit", name="addProduct")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function addProduct(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -395,6 +413,7 @@ class DashbordController extends AbstractController
     /**
      * permet de modifier un produit
      * @Route("/dashbord/modifier-produit/{productName} ", name="editProduct")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function editprod($productName,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo,Request $request)
@@ -487,6 +506,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer un produit
      * @Route("/dashbord/supprimer-produit/{image} ", name="removeProduct")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function removeProduct($image,ProductRepository $productRepo)
@@ -523,6 +543,7 @@ class DashbordController extends AbstractController
 
     /**
      * @Route("/dashbord/metier", name="job")
+     * @IsGranted("ROLE_USER")
      */
     public function showJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -537,6 +558,7 @@ class DashbordController extends AbstractController
     /**
      * permet d'ajouter un métier 
      * @Route("/dashbord/ajouter-metier", name="addJob")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function addJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -591,6 +613,7 @@ class DashbordController extends AbstractController
     /**
      * permet de modifier un métier
      * @Route("/dashbord/modifier-metier/{job} ", name="editJob")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function editJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -641,6 +664,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer un métier
      * @Route("/dashbord/supprimer-metier/{job} ", name="removeJob")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function removeJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -669,6 +693,7 @@ class DashbordController extends AbstractController
 
     /**
      * @Route("/realisation ", name="productionJob")
+     * @IsGranted("ROLE_USER")
      */
     public function showProductionJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -685,6 +710,7 @@ class DashbordController extends AbstractController
     /**
      * permet d'ajouter une réalisation
      * @Route("/dashbord/ajouter-realisation", name="addProductionJob")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function addProductionJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -742,6 +768,7 @@ class DashbordController extends AbstractController
     /**
      * permet de modifier une réalisation
      * @Route("/dashbord/modifier-realisation/{slug}", name="editProductionJob")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function editProductionJob($slug,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductionJobRepository $productionJobRepo,Request $request)
@@ -791,6 +818,7 @@ class DashbordController extends AbstractController
 
     /**
      * @Route("/supprime/image/{id}", name="annonces_delete_image", methods={"DELETE"})
+     * @IsGranted("ROLE_USER")
      */
     public function deleteImage(ProductionImage $image, Request $request){
         $data = json_decode($request->getContent(), true);
@@ -817,6 +845,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer une catégorie
      * @Route("/dashbord/supprimer-Pj/{id} ", name="removeProductionJob")
+     * @IsGranted("ROLE_USER")
      * @return Response
      */
     public function removeProductionJob($id,ProductionJobRepository $productionJobRepo)
@@ -839,6 +868,157 @@ class DashbordController extends AbstractController
             
         ]);
     }
+
+/***************************************************************************************************/
+
+    /**
+     * @Route("/dashbord/utilisateur", name="user")
+     * @IsGranted("ROLE_USER")
+     */
+    public function showUser(UserRepository $userRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $users = $userRepo->findAll();
+        return $this->render('/dashbord/showUser.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'users' => $users,
+        ]);
+    }
+
+     /**
+     * permet d'ajouter un utilisateur 
+     * @Route("/dashbord/ajouter-utilisateur", name="addUser")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function addUser(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,UserPasswordEncoderInterface $encoder)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $addUser = new User();
+        $addUserForm = $this->createForm(UserType::class,$addUser);
+        $addUserForm-> handleRequest($request);
+        if($addUserForm->isSubmitted() && $addUserForm->isValid())
+        {
+            $manager=$this->getDoctrine()->getManager();
+            $pass = $encoder->encodePassword($addUser, $addUser->getPass());
+            $addUser->setPass($pass);
+            $manager->persist($addUser); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "L'utilisateur ".$addUser->getFirstName()." ".$addUser->getLastName()." a bien été ajouté"
+            );
+            return $this-> redirectToRoute('user');
+        }   
+        return $this->render('dashbord/addUser.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'addUserForm'=> $addUserForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de modifier un utilisateur 
+     * @Route("/dashbord/modifier-utilisateur/{id}/{slug}", name="editUser")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function editUser($id,$slug,UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $editUser = $userRepo->findOneByid($id);
+        $editUserForm = $this->createForm(EditUserType::class,$editUser);
+        $editUserForm-> handleRequest($request);
+        if($editUserForm->isSubmitted() && $editUserForm->isValid())
+        {
+            $manager=$this->getDoctrine()->getManager();
+            $manager->persist($editUser); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "L'utilisateur ".$editUser->getFirstName()." ".$editUser->getLastName()." a bien été ajouté"
+            );
+            return $this-> redirectToRoute('user');
+        }   
+        return $this->render('dashbord/editUser.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'editUserForm'=> $editUserForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de modifier le mot de passe utilisateur 
+     * @Route("/dashbord/modifier-mot-de-passe", name="updatePass")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function updatePass(UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,UserPasswordEncoderInterface $encoder)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $user= $this->getUser();
+        $updatePass= new UpdatePass();
+        $updatePassForm = $this->createForm(UpdatePassType::class,$updatePass);
+        $updatePassForm-> handleRequest($request);
+        if($updatePassForm->isSubmitted() && $updatePassForm->isValid())
+        {
+            if (!password_verify($updatePass->getOldPass(), $user->getPass()))
+            {
+                $this->addFlash(
+                    'danger',
+                    "Votre ancin mot de passe est incorrect"
+                );
+            }else
+            {
+                $newPass= $updatePass->getNewPass();
+                $pass= $encoder->encodePassword($user, $newPass);
+                $user->setPass($pass);
+                $manager=$this->getDoctrine()->getManager();
+                $manager->persist($user); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    "Votre mot de passe a bien été modifié"
+                );
+                return $this-> redirectToRoute('user');
+            }
+            
+        }   
+        return $this->render('dashbord/updatePass.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'updatePassForm'=> $updatePassForm->createView(),
+        ]);
+    }
+
+
+    /**
+     * permet de supprimer un utilisateur
+     * @Route("/dashbord/supprimer-utilisatuer/{id} ", name="removeUser")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function removeUser($id,UserRepository $userJobRepo)
+    {   
+        $removeUser = $userJobRepo->findOneById($id);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($removeUser); 
+        $manager->flush();
+            $this->addFlash(
+                'success',
+                "L'utilisateur ".$removeUser->getFirstName()." ".$removeUser->getLastName()." a bien été supprimé"
+            );
+            return $this-> redirectToRoute('user');
+        return $this->render('dashbord/showProductionJob.html.twig', [
+            
+        ]);
+    }
+
 
 
 

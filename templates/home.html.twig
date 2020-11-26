@@ -55,7 +55,7 @@
     </div>
 
 
-{#*********************************** QUI SOMMES NOUS ***********************************#}
+    {#*********************************** QUI SOMMES NOUS ***********************************#}
 
     <div class="row my-5">
         <div class="section-header col-md-12">
@@ -83,29 +83,52 @@
 {#*********************************** PROJET ***********************************#}
 
 <div class="p-3 my-5" style="width: 100%; background-color: #043661;color: white;">
-      <center>
+    <center>
         <h2 class="my-3">VOUS AVEZ UN PROJET ?</h2>
-      </center>
-        
-        <div class="container">
-            <div class="row p-3">
-              <p class="text-center">
-                Nous étudions toutes les demandes concernant l’agencement hôtelier, quelle que soit la taille de votre établisement. Contacter SIMAFE, c’est choisir une solution d'agencement répondant au spécifications de l’hôtellerie, une garantie sur la qualité, la valorisation de votre établissement et un engagement sur le respect des délais et du budget.
-              </p>
-            </div>
-    
-            <div class="row d-flex justify-content-center">
-              <a href="{{path('production',{'slug': 'hotellerie' })}}"><button type="button" class="btn btn-outline-light m-3">Nos réalisations</button></a>
-              <button  type="button" class="btn btn-outline-light m-3">Nous contacter</button>
-            </div>
-        </div>
-    <br>
-    </div>
+    </center>
 
-{#*********************************** IL NOUS ONT FAIT CONFIANCE ***********************************#}
+    <div class="container">
+        <div class="row p-3">
+            <p class="text-center">
+                Nous étudions toutes les demandes concernant l’agencement hôtelier, quelle que soit la taille de votre
+                établisement. Contacter SIMAFE, c’est choisir une solution d'agencement répondant au spécifications de
+                l’hôtellerie, une garantie sur la qualité, la valorisation de votre établissement et un engagement sur
+                le respect des délais et du budget.
+            </p>
+        </div>
+
+        <div class="row d-flex justify-content-center">
+            <a href="{{path('production',{'slug': 'hotellerie' })}}"><button type="button"
+                    class="btn btn-outline-light m-3">Nos réalisations</button></a>
+            <button type="button" class="btn btn-outline-light m-3">Nous contacter</button>
+        </div>
+    </div>
+    <br>
+</div>
+
+{#*********************************** NEWSLETTER ***********************************#}
 
 <center>
-    <h2 class="my-5">ILS NOUS ONT FAIT CONFIANCE</h2>
-  </center>
+
+    <div class="my-5 py-3"style="background-color: #efeeea;">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="mb-4">NEWSLETTER</h2>
+                    <h5 class="my-4">SUIVEZ NOTRE ACTUALITÉ EN VOUS INSCRIVANT DÉS MAINTENANT SUR NOTRE NEWSLETTER ! </h5>
+                </div>
+                
+                <div class="col-md-12">
+                    <div style="max-width: 500px;">
+                        {{ form_start(newsletterForm) }}
+                        {{ form_widget(newsletterForm) }}
+                        <button type="submit" class="btn btn-primary" style="font-size: 16px;">Envoyer</button>
+                        {{ form_end(newsletterForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</center>
 
 {% endblock %}

@@ -24,6 +24,7 @@ use App\Repository\UserRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\NewsletterRepository;
 use App\Repository\ProductionJobRepository;
 use App\Repository\ProductionImageRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -1018,6 +1019,138 @@ class DashbordController extends AbstractController
             
         ]);
     }
+
+
+/***************************************************************************************************/
+
+    /**
+     * @Route("/dashbord/newsletter", name="newsletter")
+     * @IsGranted("ROLE_USER")
+     */
+    public function showNewsletter(NewsletterRepository $newsletterRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $subscribers = $newsletterRepo->findAll();
+        return $this->render('/dashbord/showNewsletter.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'subscribers' => $subscribers,
+        ]);
+    }
+
+    /**
+     * @Route("/dashbord/newsletter/emails", name="emails")
+     * @IsGranted("ROLE_USER")
+     */
+    public function emails(NewsletterRepository $newsletterRepo): Response
+    {
+        
+        $subscribers = $newsletterRepo->findAll();
+        return $this->render('/dashbord/emails.html.twig', [
+            'subscribers' => $subscribers,
+        ]);
+    }
+
+    /**
+     * @Route("/dashbord/newsletter/{id}", name="subscriber")
+     * @IsGranted("ROLE_USER")
+     */
+    public function showsubscriber($id,NewsletterRepository $newsletterRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $subscribers = $newsletterRepo->findOneById($id);
+        $defaultData = ['message' => 'Type your message here'];
+        $form = $this->createFormBuilder($defaultData)
+            ->getForm();
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $manager=$this->getDoctrine()->getManager();
+            if($subscribers->getStatus()==false)
+            {
+                $subscribers->setStatus(true);
+                $manager->persist($subscribers); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    $subscribers->getName()." a été validé"
+                );
+            }else
+            {
+                $subscribers->setStatus(false);
+                $manager->persist($subscribers); 
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    $subscribers->getName()." a été dévalidé"
+                );
+            }
+           
+            return $this-> redirectToRoute('newsletter');
+        }   
+        return $this->render('/dashbord/showsubscriber.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'subscribers' => $subscribers,
+            'form'=> $form->createView(),
+        ]);
+    }
+
+    /**
+     * permet de supprimer un abonné
+     * @Route("/dashbord/supprimer-abonne/{id} ", name="removeSubscribers")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function removeSubscribers($id,NewsletterRepository $newsletterRepo)
+    {   
+        $subscribers = $newsletterRepo->findOneById($id);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($subscribers); 
+        $manager->flush();
+            $this->addFlash(
+                'success',
+                 $subscribers->getName()." a bien été supprimé"
+            );
+            return $this-> redirectToRoute('newsletter');
+        return $this->render('dashbord/showProductionJob.html.twig', [
+            
+        ]);
+    }
+
+    /**
+     * permet de supprimer un abonné
+     * @Route("/dashbord/supprimer-tous-les-abonnes ", name="removeSubAll")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function removeAllSuscr(NewsletterRepository $newsletterRepo)
+    {  
+        $subscribers = $newsletterRepo->findAll();
+        $manager=$this->getDoctrine()->getManager();
+        foreach ($subscribers as $sub)
+        {
+            $remove= $sub->getUnsubscribe();
+            if($remove != false )
+            {
+                $manager->remove($sub); 
+            }
+        }
+        $manager->flush();
+            $this->addFlash(
+                'success',
+                 "Abonnés supprimés"
+            );
+            return $this-> redirectToRoute('newsletter');
+        return $this->render('dashbord/showProductionJob.html.twig', [
+            
+        ]);
+    }
+
+     
+
 
 
 

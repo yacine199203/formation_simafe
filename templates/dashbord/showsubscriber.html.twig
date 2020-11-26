@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Abonné{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class=" row m-3">
+        <div style="max-width: 500px;" class="bg-light mx-auto my-5 p-5 shadow-sm border border-secondary rounded">
+            <table class="table">
+                <tr >
+                    <td>Nom :</td>
+                    <td>{{subscribers.name}}</td>
+                </tr>
+                <tr >
+                    <td>Entreprise :</td>
+                    <td>{{subscribers.company|upper}}</td>
+                </tr>
+                <tr >
+                    <td>Email :</td>
+                    <td>{{subscribers.email}}</td>
+                </tr>
+            </table>
+            
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+
+            <div class="modal-footer">
+                {% if subscribers.status == false %}
+                <button type="submit" class="btn btn-primary" style="font-size: 16px;">Valider</button>
+                {% else %}
+                <button type="submit" class="btn btn-danger" style="font-size: 16px;">Dévalider</button>
+                {% endif %}
+            </div>
+            {{ form_end(form) }}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

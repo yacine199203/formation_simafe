@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recrutement{% endblock %}
+
+
+
+{% block body %}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-12 text-center my-2">
+            <h5 style="color: #007bff;">Rejoignez notre aventure</h5>
+        </div>
+        <div class="col-md-12 text-center">
+            <h3>On est toujours à la recherche de gens talentueux et authentiques</h3>
+        </div>
+        <div class="col-md-12 px-5">
+            <h4>Ce qu'on recherche :</h4>
+            <p>On a besoin de gens passionnés avec un esprit d'équipe, qui cherchent toujours à perfectionner leurs
+                compétences,
+                qui comprennent leurs rôles et l'impacte de leur travail dans l'équipe.</p>
+            <p>On apprécie la transparence et l'honnêteté, les gens qui disent ce qu'ils pensent même si n'est pas
+                l'opinion populaire.
+                Le client est rois mais pas toujours correcte, pour cela nous devons leur apprendre avec commentaires et
+                propositions constructives.</p>
+
+            <h4>Postes disponibles :</h4>
+            <p>Ci-dessous sont les postes qu'on recherche activement. Si vous souhaitez nous rejoindre mais vous ne voyez
+                pas votre rôle!
+                Ecrivez-nous directement sur <strong>infos@simafe.com</strong></p>
+
+        </div>
+    </div>
+    <div class="row px-5 my-5">
+        {% for rec in recruitement %}
+        <div class="col-md-4 p-2 ">
+            <a href="{{path('condition',{'id': rec.id})}}">
+                <div class="p-5 text-center 
+                bg-{{ random(['primary','secondary','success','danger','warning', 'info', 'dark','danger']) }} text-white" style="height: 200px;">
+                    <h2>{{rec.job}}</h2>
+                    <h5>{{rec.city}}</h5>
+                </div>
+            </a>
+            
+        </div>
+        {% endfor %}
+</div>
+{% endblock %}

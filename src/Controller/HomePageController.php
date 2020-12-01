@@ -10,6 +10,7 @@ use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\JobProductRepository;
 use App\Repository\NewsletterRepository;
+use App\Repository\RecruitementRepository;
 use App\Repository\ProductionJobRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,6 +99,41 @@ class HomePageController extends AbstractController
         ]);
     }
 
+    /**
+     * permet de voir la page recrutement
+     * @Route("/recrutement", name="recruitment")
+     * 
+     * @return Response
+     */
+    public function recruitement(RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $recruitement = $recruitementRepo->findAll();
+        return $this->render('recruitement.html.twig', [
+            'categorys' => $categorys,//drop-down nos produits
+            'jobs' => $jobs,
+            'recruitement' => $recruitement,
+        ]);
+    }
+    /**
+     * permet de voir la page conditions
+     * @Route("/recrutement/{id}", name="condition")
+     * 
+     * @return Response
+     */
+    public function conditions($id,RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $recruitement = $recruitementRepo->findOneById($id);
+        return $this->render('conditions.html.twig', [
+            'categorys' => $categorys,//drop-down nos produits
+            'jobs' => $jobs,
+            'recruitement' => $recruitement,
+        ]);
+    }
+
     /***************************************************************************************************/
 
     /**
@@ -182,6 +218,7 @@ class HomePageController extends AbstractController
     }
 
 
+     
 }
 
 

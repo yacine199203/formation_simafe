@@ -15,8 +15,10 @@ use App\Entity\UpdatePass;
 use App\Form\CategoryType;
 use App\Form\EditUserType;
 use Cocur\Slugify\Slugify;
+use App\Entity\Recruitement;
 use App\Form\UpdatePassType;
 use App\Entity\ProductionJob;
+use App\Form\RecruitementType;
 use App\Entity\ProductionImage;
 use App\Form\ProductionJobType;
 use App\Repository\JobRepository;
@@ -25,6 +27,7 @@ use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\NewsletterRepository;
+use App\Repository\RecruitementRepository;
 use App\Repository\ProductionJobRepository;
 use App\Repository\ProductionImageRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -1148,8 +1151,119 @@ class DashbordController extends AbstractController
             
         ]);
     }
+/***************************************************************************************************/
 
+    /**
+     * voir recrutement
+     * @Route("/dashbord/recrutement", name="showRecruitment")
+     * @IsGranted("ROLE_USER")
+     */
+    public function showRec(RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $recruitement = $recruitementRepo->findAll();
+        return $this->render('/dashbord/showRecruitement.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'recruitement' => $recruitement,
+        ]);
+    }
+
+    /**
+     * permet d'ajouter une offre d'emploi 
+     * @Route("/dashbord/ajouter-offre-d-emploi", name="addRec")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function addRec(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $addRec = new Recruitement();
+        $addRecForm = $this->createForm(RecruitementType::class,$addRec);
+        $addRecForm-> handleRequest($request);
+        if($addRecForm->isSubmitted() && $addRecForm->isValid())
+        {
+            $manager=$this->getDoctrine()->getManager();
+            foreach ($addRec->getConditions() as $cond)
+                {
+                    $cond->setRecruitement($addRec);
+                    $manager->persist($cond);
+                }
+            $manager->persist($addRec); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "l'offre d'emploi ".$addRec->getJob()." a bien été ajoutée"
+            );
+            return $this-> redirectToRoute('showRecruitment');
+        }   
+        return $this->render('dashbord/addRecruitement.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'addRecForm'=> $addRecForm->createView(),
+        ]);
+    }
      
+
+    /**
+     * permet de modifier une offre d'emploi 
+     * @Route("/dashbord/modifier-offre-d-emploi/{id}", name="editRec")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function editRec($id,RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $editRec = $recruitementRepo->findOneById($id);
+        $editRecForm = $this->createForm(RecruitementType::class,$editRec);
+        $editRecForm-> handleRequest($request);
+        if($editRecForm->isSubmitted() && $editRecForm->isValid())
+        {
+            $manager=$this->getDoctrine()->getManager();
+            foreach ($editRec->getConditions() as $cond)
+                {
+                    $cond->setRecruitement($editRec);
+                    $manager->persist($cond);
+                }
+            $manager->persist($editRec); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "L'offre d'emploi ".$editRec->getJob()." a bien été modifiée"
+            );
+            return $this-> redirectToRoute('showRecruitment');
+        }   
+        return $this->render('dashbord/editRecruitement.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'editRecForm'=> $editRecForm->createView(),
+        ]);
+    }
+
+    /**
+     * permet de supprimer une offre d'emploi
+     * @Route("/dashbord/supprimer-offre-d-emploi/{id} ", name="removeRec")
+     * @IsGranted("ROLE_USER")
+     * @return Response
+     */
+    public function removeRec($id,RecruitementRepository $recruitementRepo)
+    {   
+        $removeRec = $recruitementRepo->findOneById($id);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->remove($removeRec); 
+        $manager->flush();
+            $this->addFlash(
+                'success',
+                 "L'offre d'emploi ".$removeRec->getJob()." a bien été supprimée"
+            );
+            return $this-> redirectToRoute('showRecruitment');
+        return $this->render('dashbord/showProductionJob.html.twig', [
+            
+        ]);
+    }
 
 
 

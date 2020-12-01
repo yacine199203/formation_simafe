@@ -54,7 +54,7 @@ class Characteristics
 
     public function setCharacteristics(string $characteristics): self
     {
-        $this->characteristics = $characteristics;
+        $this->characteristics = ucfirst(mb_strtolower($characteristics, 'UTF-8'));
 
         return $this;
     }

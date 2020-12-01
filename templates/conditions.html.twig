@@ -1,0 +1,31 @@
+{% extends "/base.html.twig" %}
+{% block title %}{{recruitement.job}}{% endblock %}
+
+
+{% block body %}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-12 my-1 text-center text-primary">
+            <h4>{{recruitement.city}}</h4>
+        </div>
+        <div class="col-md-12 my-1 text-center">
+            <h2>{{recruitement.job}}</h2>
+        </div>
+        <div class="col-md-12 my-3 px-5">
+            <p>
+                Rejoindre <strong>SIMAFE</strong>, c’est faire partie d’une équipe de passionnés et engagés pour son métier.
+
+                C’est également accompagner nos clients dans leur transformation, grâce à notre
+                force de proposition et l’expertise de notre équipe.
+            </p>
+            <h4>Conditions :</h4>
+            <ul>
+                {% for cond in recruitement.conditions %}
+                <li class="my-1">{{cond.liste}}</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une offre d'emploi{% endblock %}
+
+{% form_theme addRecForm _self %}
+
+{% block body %}
+    <div class="container">
+        <div class=" row m-3" >
+            <div style="max-width: 500px;" class="bg-light mx-auto my-5 p-5 shadow-sm border border-secondary rounded">
+                <h2 class="my-2 " style="font-weight: 500;">Ajouter une offre d'emploi</h2>
+                {{ form_start(addRecForm) }}
+                {{ form_widget(addRecForm) }}
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" style="font-size: 16px;">Enregistrer</button>
+                </div>
+                {{ form_end(addRecForm) }}
+            </div>  
+        </div>
+    </div>
+{% endblock %}
+
+{% block _recruitement_conditions_entry_row %}
+{{ form_widget(form) }}
+{% endblock %}
+
+{% block _recruitement_conditions_entry_widget %}
+    <div class="form-group" id="block_{{ id }}">
+        <div class="row">
+            <div class="col-md-11 pr-0">
+                {{ form_widget (form.liste)}}
+            </div>
+            <div class="col-md-1 p-0">
+                <button type="button" data-action="delete" data-target="#block_{{ id }}" class="btn pr-0 btnmdsup delete" style="font-size: 20px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+ 
+{% block _recruitement_conditions_widget %}
+    {{ form_widget(form) }}
+    <input type="hidden" id="widgets-counter" value="0">
+    <div class="form-group" >
+        <button id="add-cond" type="button" class="btn pr-0 btnmdsup" style="font-size: 20px;">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+{% endblock %}
+{% block javascripts %}
+<script>
+  
+    $('#add-cond').click(function(){
+        // récupèrer le numéro du future champ à ajouter
+        const index = +$('#widgets-counter').val();
+        // récupèrer le prototype html généré par symfony voir inspecter code
+        const tmpl = $('#recruitement_conditions').data('prototype').replace(/__name__/g,index);
+        //injecter le code 
+        $('#recruitement_conditions').append(tmpl);
+        $('#widgets-counter').val(index+1);
+        handleDeleteButtons();
+    });
+
+    function handleDeleteButtons() {
+        $('button[data-action="delete"]').click(function(){
+            const target = this.dataset.target;
+            $(target).remove();
+        });
+    }
+
+    function updatecounter() {
+        const count = +$('#recruitement_conditions div.form-group').length;
+        $('#widgets-counter').val(count);
+    }
+
+    updatecounter();
+    handleDeleteButtons();
+</script>
+{% endblock %}

@@ -29,9 +29,11 @@ class ContactController extends AbstractController
 
             // On crée le message
             $file= $form->get('file')->getData();
-            $fileName= 'contactFile.'.$file->guessExtension();
-            $file->move($this->getParameter('upload_directory_png'),$fileName);
-            $message = (new \Swift_Message('Nouveau contact'))
+            if($file != null)
+            {
+                $fileName= 'contactFile.'.$file->guessExtension();
+                $file->move($this->getParameter('upload_directory_png'),$fileName);
+                $message = (new \Swift_Message('Nouveau contact'))
                 // On attribue l'expéditeur
                 ->setFrom($form->get('email')->getData())
                 // On attribue le destinataire
@@ -45,8 +47,24 @@ class ContactController extends AbstractController
                 )
                 
                 ->attach(\Swift_Attachment::fromPath($this->getParameter('upload_directory_png').'/'.$fileName))
-
             ;
+            }else{
+                $message = (new \Swift_Message('Nouveau contact'))
+                // On attribue l'expéditeur
+                ->setFrom($form->get('email')->getData())
+                // On attribue le destinataire
+                ->setTo('bouadjenek.yacin@gmail.com')
+                // On crée le texte avec la vue
+                ->setBody(
+                    $this->renderView(
+                        'contact/mail.html.twig', compact('contact')
+                    ),
+                    'text/html'
+                )
+            ;
+            }
+            
+            
             $mailer->send($message);
 
             $message1 = (new \Swift_Message('Accusé de récéption'))

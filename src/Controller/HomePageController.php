@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Newsletter;
 use App\Form\NewsletterType;
+use App\Form\ProductSearchType;
 use App\Repository\JobRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
+use Doctrine\Persistence\ObjectManager;
 use App\Repository\JobProductRepository;
 use App\Repository\NewsletterRepository;
 use App\Repository\RecruitementRepository;
@@ -131,6 +133,41 @@ class HomePageController extends AbstractController
             'categorys' => $categorys,//drop-down nos produits
             'jobs' => $jobs,
             'recruitement' => $recruitement,
+        ]);
+    }
+
+     /**
+     * permet de voir la page recherche
+     * @Route("/recherche", name="search")
+     * 
+     * @return Response
+     */
+    public function search(ProductRepository $productRepo,Request $request,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $form = $this->createForm(ProductSearchType::class);
+        $form-> handleRequest($request);
+        $product=null;
+        $result=null;
+        $message = null;
+        $manager=$this->getDoctrine()->getManager();
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $result=$form->get('word')->getData();
+            $product=$manager->createQuery('SELECT p FROM App\Entity\Product p WHERE p.productName LIKE \'%'.$result.'%\'')->getResult();
+            if($product == null)
+            {
+                $message="Votre recherche <strong>\"".$result."\"</strong> n'a donné aucun résultat.";  
+            }
+        }
+        return $this->render('search.html.twig', [
+            'categorys' => $categorys,//drop-down nos produits
+            'jobs' => $jobs,
+            'product' => $product,
+            'result'=>$result,
+            'message'=>$message,
+            'form'=> $form->createView(),
         ]);
     }
 

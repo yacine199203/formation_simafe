@@ -1,0 +1,56 @@
+{% extends "/model.html.twig" %}
+
+{% block title %}Recherche{% endblock %}
+
+{% block arbo %}
+
+<div>
+    {% if result != null %}
+        Votre recherche pour "<strong>{{result}}</strong>"
+        {% else %}
+        <a href="{{ path('homePage') }}">Accueil</a> / Recherche
+    {% endif %}
+</div>
+
+{% endblock %}
+{% block mbody %}
+{{ form_start(form) }}
+<div class="input-group mb-5">
+    {{ form_widget(form.word) }}
+    <button type="submit" class="btn btn btn-outline-primary mx-1" style="font-size: 16px;"><i class="fas fa-search"></i></button>
+</div>
+{{ form_end(form) }}
+
+
+{% if result != null %}
+{% if product != null %}
+{% if product|length == 1 %}
+<div style="font-size: 15px;"> {{product|length}} produit</div>
+{% else %}
+<div style="font-size: 15px;"> {{product|length}} produits</div>
+{% endif %}
+<div class="row">
+    {% for p in product  %}
+    <div class="col-md-4 col-6 p-3">
+        <div class="border shadow-sm rounded p-2 product text-center">
+            <a href="{{path('productPresentation',{'slug': p.category.slug,'productSlug': p.slug})}}">
+                <img style="width: 100%" src="/images/{{p.png}}" alt="">
+            </a>
+            <h6 class="mb-1" style="font-weight: 700">{{p.category.categoryName}}</h6>
+            <div>
+                <a
+                    href="{{path('productPresentation',{'slug': p.category.slug,'productSlug': p.slug})}}">{{ p.productName }}</a>
+            </div>
+            <a href="{{path('productPresentation',{'slug': p.category.slug,'productSlug': p.slug})}}">
+                <button class="btn btn-primary py-1 my-2">En savoir plus</button>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<h5>{{message|raw}}</h5>
+{% endif %}
+
+{% endif %}
+{% endblock %}

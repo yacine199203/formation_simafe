@@ -15,20 +15,20 @@ class NewsletterType extends AbstractType
     {
         $builder
             ->add('name',TextType::class,[
-                'label'=>'Nom',
+                'label'=>false,
                 'attr'=>[
                     'placeholder'=>'Votre nom'    
                 ]
             ])
             ->add('company',TextType::class,[
-                'label'=>'Entreprise',
+                'label'=>false,
                 'attr'=>[
                     'placeholder'=>'Votre entreprise'    
                 ],
                 'required'=>false,
             ])
             ->add('email',EmailType::class,[
-                'label'=>'Email',
+                'label'=>false,
                 'attr'=>[
                     'placeholder'=>'Votre email'    
                 ]

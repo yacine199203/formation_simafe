@@ -38,9 +38,9 @@
         <h2 class="text-center">NOS PRODUITS PAR MÉTIER</h2>
     </div>
 
-    <div class="row justify-content-between">
+    <div class="row justify-content-center">
         {% for jb in jobs %}
-        <div class="col-md-4 ">
+        <div class="col-10 col-md-4 ">
             <a href="{{ path('jobProduct',{'metier': jb.slug}) }}">
                 <div class="single-works">
                     <img src="/images/{{jb.image}}">
@@ -98,9 +98,12 @@
         </div>
 
         <div class="row d-flex justify-content-center">
-            <a href="{{path('production',{'slug': 'hotellerie' })}}"><button type="button"
-                    class="btn btn-outline-light m-3">Nos réalisations</button></a>
-            <button type="button" class="btn btn-outline-light m-3">Nous contacter</button>
+            <a href="{{path('production',{'slug': 'hotellerie' })}}">
+                <button type="button" class="btn btn-outline-light m-3">Nos réalisations</button>
+            </a>
+            <a href="{{path('contact')}}">
+                <button type="button" class="btn btn-outline-light m-3">Nous contacter</button>
+            </a>
         </div>
     </div>
     <br>
@@ -110,7 +113,7 @@
 
 <center>
 
-    <div class="my-5 py-3"style="background-color: #efeeea;">
+    <div class="mt-5 py-5"style="background-color: #efeeea;">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -119,10 +122,18 @@
                 </div>
                 
                 <div class="col-md-12">
-                    <div style="max-width: 500px;">
+                    <div style="max-width: 750px;">
                         {{ form_start(newsletterForm) }}
-                        {{ form_widget(newsletterForm) }}
-                        <button type="submit" class="btn btn-primary" style="font-size: 16px;">Envoyer</button>
+                        <div class="input-group">
+                            <div class="p-1">{{ form_widget(newsletterForm.name) }}</div>
+                            <div class="p-1">{{ form_widget(newsletterForm.company) }}</div>
+                            <div class="p-1">{{ form_widget(newsletterForm.email) }}</div>
+                            <div class="p-1"><button type="submit" class="btn btn-outline-dark" style="font-size: 16px;">Envoyer</button></div>
+                            
+                            
+                            
+                            
+                        </div>
                         {{ form_end(newsletterForm) }}
                     </div>
                 </div>

@@ -39,7 +39,8 @@
         {% endfor %}
     </ul>
 </div>
-
+{% if category.products|length > 3 %}
+    
 <h5 class="bg-primary p-2 rounded" style="width: 205px; color: white;">Produits Similaires :</h5>
 
 <div class="owl-carousel owl-theme my-5">
@@ -65,6 +66,7 @@
     {% endif %}
     {% endfor %}
 </div>
+{% endif %}
 {% endblock %}
 {% block javascripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"

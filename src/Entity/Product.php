@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @ORM\Table(name="Product", indexes={@ORM\Index(columns={"product_name"}, flags={"fulltext"})})
  * @ORM\HasLifecycleCallbacks
  * @UniqueEntity(
  * fields={"productName"},

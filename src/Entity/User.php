@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Cocur\Slugify\Slugify;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -54,6 +56,18 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $slug;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Role::class, mappedBy="user", orphanRemoval=true, cascade={"persist"})
+     */
+    private $userRoles;
+
+    public function __construct()
+    {
+        $this->userRoles = new ArrayCollection();
+    }
+
+
 
      /** 
     *@ORM\PrePersist
@@ -150,6 +164,36 @@ class User implements UserInterface
     }
 
     public function eraseCredentials(){}
+
+    /**
+     * @return Collection|Role[]
+     */
+    public function getUserRoles(): Collection
+    {
+        return $this->userRoles;
+    }
+
+    public function addUserRole(Role $userRole): self
+    {
+        if (!$this->userRoles->contains($userRole)) {
+            $this->userRoles[] = $userRole;
+            $userRole->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRole(Role $userRole): self
+    {
+        if ($this->userRoles->removeElement($userRole)) {
+            // set the owning side to null (unless already changed)
+            if ($userRole->getUser() === $this) {
+                $userRole->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 
    
 }

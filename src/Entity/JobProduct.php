@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\JobProduct;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\JobProductRepository;
 use Symfony\Component\Validator\Constraints as Assert;

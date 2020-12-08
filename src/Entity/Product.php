@@ -67,7 +67,7 @@ class Product
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="product", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=JobProduct::class, mappedBy="product", orphanRemoval=true,cascade={"persist"})
      * @Assert\Valid()
      */
     private $jobProducts;

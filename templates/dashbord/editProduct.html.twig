@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ajouter un produit{% endblock %}
+{% block title %}Modifier un produit{% endblock %}
 
 {% form_theme editProdForm _self %}
 
@@ -11,7 +11,26 @@
                 <div style="max-width: 500px;" class="bg-light mx-auto my-5 p-5 shadow-sm border border-secondary rounded">
                     <h2 class="my-4 " style="font-weight: 500;">Modifier un Produit</h2>
             {{ form_start(editProdForm) }}
-            {{ form_widget(editProdForm) }}
+            {{ form_row(editProdForm.productName) }}
+            {{ form_row(editProdForm.png) }}
+            {{ form_row(editProdForm.pdf) }}
+            {{ form_row(editProdForm.image) }}
+            {{ form_row(editProdForm.category) }}
+            {{ form_row(editProdForm.jobProducts) }}
+            {% if app.request.attributes.get('_route') == 'editProduct' %}
+                {% for ePro in editProduct.jobProducts %}
+                
+                <div class="row justify-content-between px-4 border-bottom mx-3 ">
+                    <h6 class="my-auto">{{ePro.job}}</h6>
+    
+                    {# On ajoute un lien permettant de supprimer une image (sera géré en Ajax) #}
+                    <a href="{{ path('annonces_delete_produit', {id: ePro.id})}}" data-delete
+                        data-token="{{ csrf_token('delete'~ ePro.id )}}" class="btn pr-0 btnmdsup delete"><i
+                            class="far fa-trash-alt"></i></a>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {{ form_row(editProdForm.characteristics) }}
                 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" style="font-size: 16px;">Modifier</button>
@@ -25,11 +44,11 @@
 
 {% endblock %}
 
-{% block _product_characteristics_entry_row %}
+{% block _edit_product_characteristics_entry_row %}
 {{ form_widget(form) }}
 {% endblock %}
 
-{% block _product_characteristics_entry_widget %}
+{% block _edit_product_characteristics_entry_widget %}
     <div class="form-group" id="block_{{ id }}">
         <div class="row">
             <div class="col-md-11 pr-0">
@@ -44,7 +63,7 @@
     </div>
 {% endblock %}
 
-{% block _product_characteristics_widget %}
+{% block _edit_product_characteristics_widget %}
     {{ form_widget(form) }}
     <input type="hidden" id="widgets-counter" value="0">
     <div class="form-group" >
@@ -54,34 +73,6 @@
     </div>
 {% endblock %}
 
-{% block _product_jobProducts_entry_row %}
-{{ form_widget(form) }}
-{% endblock %}
-
-{% block _product_jobProducts_entry_widget %}
-    <div class="form-group" id="block_{{ id }}">
-        <div class="row">
-            <div class="col-md-11 pr-0">
-                {{ form_widget (form.job)}}
-            </div>
-            <div class="col-md-1 p-0">
-                <button type="button" data-action="delete" data-target="#block_{{ id }}" class="btn pr-0 btnmdsup delete" style="font-size: 20px;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block _product_jobProducts_widget %}
-    {{ form_widget(form) }}
-    <input type="hidden" id="widgets-counterj" value="0">
-    <div class="form-group" >
-        <button id="add-jp" type="button" class="btn pr-0 btnmdsup" style="font-size: 20px;">
-            <i class="fas fa-plus"></i>
-        </button>
-    </div>
-{% endblock %}
 
 
 {% block javascripts %}
@@ -96,9 +87,9 @@
             // récupèrer le numéro du future champ à ajouter
             const index = +$('#widgets-counter').val();
             // récupèrer le prototype html généré par symfony voir inspecter code
-            const tmpl = $('#product_characteristics').data('prototype').replace(/__name__/g,index);
+            const tmpl = $('#edit_product_characteristics').data('prototype').replace(/__name__/g,index);
             //injecter le code 
-            $('#product_characteristics').append(tmpl);
+            $('#edit_product_characteristics').append(tmpl);
             $('#widgets-counter').val(index+1);
             handleDeleteButtons();
         });
@@ -120,31 +111,40 @@
     </script>
 
     <script>
-
-        $('#add-jp').click(function(){
-            // récupèrer le numéro du future champ à ajouter
-            const indexj = +$('#widgets-counterj').val();
-            // récupèrer le prototype html généré par symfony voir inspecter code
-            const tmplj = $('#product_jobProducts').data('prototype').replace(/__name__/g,indexj);
-            //injecter le code 
-            $('#product_jobProducts').append(tmplj);
-            $('#widgets-counterj').val(indexj+1);
-            handleDeleteButtonsj();
-        });
-
-        function handleDeleteButtonsj() {
-            $('button[data-action="delete"]').click(function(){
-                const target = this.dataset.target;
-                $(target).remove();
-            });
+        window.onload = () => {
+            // Gestion des boutons "Supprimer"
+            let links = document.querySelectorAll("[data-delete]")
+            
+            // On boucle sur links
+            for(link of links){
+                // On écoute le clic
+                link.addEventListener("click", function(e){
+                    // On empêche la navigation
+                    e.preventDefault()
+        
+                    // On demande confirmation
+                    if(confirm("Voulez-vous supprimer cette image ?")){
+                        // On envoie une requête Ajax vers le href du lien avec la méthode DELETE
+                        fetch(this.getAttribute("href"), {
+                            method: "DELETE",
+                            headers: {
+                                "X-Requested-With": "XMLHttpRequest",
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({"_token": this.dataset.token})
+                        }).then(
+                            // On récupère la réponse en JSON
+                            response => response.json()
+                        ).then(data => {
+                            if(data.success)
+                                this.parentElement.remove()
+                            else
+                                alert(data.error)
+                        }).catch(e => alert(e))
+                    }
+                })
+            }
         }
-
-        function updatecounterj() {
-            const count = +$('#product_jobProducts div.form-group').length;
-            $('#widgets-counterj').val(count);
-        }
-
-        updatecounterj();
-        handleDeleteButtonsj();
     </script>
+
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Job;
+use App\Entity\Role;
 use App\Entity\User;
 use App\Form\JobType;
 use App\Form\UserType;
@@ -11,6 +12,7 @@ use App\Entity\Sliders;
 use App\Entity\Category;
 use App\Form\ProductType;
 use App\Form\SlidersType;
+use App\Entity\JobProduct;
 use App\Entity\UpdatePass;
 use App\Form\CategoryType;
 use App\Form\EditUserType;
@@ -18,13 +20,16 @@ use Cocur\Slugify\Slugify;
 use App\Entity\Recruitement;
 use App\Form\UpdatePassType;
 use App\Entity\ProductionJob;
+use App\Form\EditProductType;
 use App\Form\RecruitementType;
 use App\Entity\ProductionImage;
 use App\Form\ProductionJobType;
 use App\Repository\JobRepository;
+use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
+use Symfony\Component\Form\FormError;
 use App\Repository\CategoryRepository;
 use App\Repository\NewsletterRepository;
 use App\Repository\RecruitementRepository;
@@ -341,24 +346,15 @@ class DashbordController extends AbstractController
             $fileImage= $addProdForm->get('image')->getData();
             if($filePng == null)
             {
-                $this->addFlash(
-                    'danger',
-                    "Le champ Image de présentation est vide \n"
-                );
+                $addProdForm->get('png')->addError(new FormError("Ce champ est vide"));
             }
             elseif($filePdf == null)
             {
-                $this->addFlash(
-                    'danger',
-                    "Le champ Fiche téchnique est vide \n"
-                );
+                $addProdForm->get('pdf')->addError(new FormError("Ce champ est vide"));
             }
             elseif($fileImage == null)
             {
-                $this->addFlash(
-                    'danger',
-                    "Le champ Image est vide \n"
-                );
+                $addProdForm->get('image')->addError(new FormError("Ce champ est vide"));
             }
             else
             {
@@ -373,10 +369,7 @@ class DashbordController extends AbstractController
                     ); 
                 }elseif($filePdf->guessExtension()!='pdf')
                 {
-                    $this->addFlash(
-                        'danger',
-                        "votre fichier doit être en format pdf "
-                    );   
+                    $editUserForm->get('pdf')->addError(new FormError("Le format de ce fichier doit être en PDF"));   
                 }
                 $filePng->move($this->getParameter('upload_directory_png'),$fileNamePng);
                 $filePdf->move($this->getParameter('upload_directory_pdf'),$fileNamePdf);
@@ -392,10 +385,11 @@ class DashbordController extends AbstractController
                     $chara->setProduct($addProduct);
                     $manager->persist($chara);
                 }
-                foreach ($addProduct->getJobProducts() as $jp)
-                {
-                    $jp->setProduct($addProduct);
-                    $manager->persist($jp);
+               
+                foreach($addProdForm->get('jobProducts')->getData() as $jp){
+                    $r= new JobProduct();
+                    $r->setJob($jp);
+                    $addProduct->addJobProduct($r);
                 }
                 $manager->persist($addProduct); 
                 $manager->flush();
@@ -424,7 +418,7 @@ class DashbordController extends AbstractController
     {   $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
         $editProduct = $productRepo->findOneBySlug($productName);
-        $editProdForm = $this->createForm(ProductType::class,$editProduct);
+        $editProdForm = $this->createForm(EditProductType::class,$editProduct);
         $editProdForm-> handleRequest($request);
         if($editProdForm->isSubmitted() && $editProdForm->isValid())
         {
@@ -435,10 +429,7 @@ class DashbordController extends AbstractController
             {
                 if($filePng->guessExtension()!='png')
                 {
-                    $this->addFlash(
-                        'danger',
-                        "votre image doit être en format png "
-                    );
+                    $editProdForm->get('png')->addError(new FormError("Le format de ce fichier doit être en PNG"));
                 }else
                 {
                     unlink('../public/images/'.$editProduct->getPng());
@@ -450,10 +441,7 @@ class DashbordController extends AbstractController
             {
                 if($filePdf->guessExtension()!='pdf')
                 {
-                    $this->addFlash(
-                        'danger',
-                        "votre fichier doit être en format pdf "
-                    );   
+                    $editProdForm->get('pdf')->addError(new FormError("Le format de ce fichier doit être en PDF"));   
                 }else
                 {
                     unlink('../public/fiches-technique/'.$editProduct->getPdf());
@@ -465,10 +453,7 @@ class DashbordController extends AbstractController
             {
                 if($fileImage->guessExtension()!='png' )
                 {
-                    $this->addFlash(
-                        'danger',
-                        "votre image doit être en format png "
-                    ); 
+                    $editProdForm->get('image')->addError(new FormError("Le format de ce fichier doit être en PNG"));
                 }else
                 {
                     unlink('../public/images/'.$editProduct->getImage());
@@ -485,11 +470,15 @@ class DashbordController extends AbstractController
                 $chara->setProduct($editProduct);
                 $manager->persist($chara);
             }
-            foreach ($editProduct->getJobProducts() as $jp)
+                $r= new JobProduct();
+                $error=$productRepo->findOneById($editProdForm->get('jobProducts')->getData());
+            if( $error==null){
+                $editProdForm->get('jobProducts')->addError(new FormError("Ce produit appartient déja à ce métier"));
+            }else
             {
-                $jp->setProduct($editProduct);
-                $manager->persist($jp);
-            }
+                $r->setJob($editProdForm->get('jobProducts')->getData());
+                $editProduct->addJobProduct($r);
+            
             $manager->persist($editProduct); 
             $manager->flush();
             $this->addFlash(
@@ -497,15 +486,38 @@ class DashbordController extends AbstractController
                 "Le produit ".$editProduct->getProductName()." a bien été modifié "
             );
             return $this-> redirectToRoute('products');
-             
+            }
         }
         return $this->render('dashbord/editProduct.html.twig', [
             'categorys'=> $categorys,//drop-down nos produits
             'jobs'=> $jobs,//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
+            'editProduct'=> $editProduct,
             'editProdForm'=> $editProdForm->createView(),
             
         ]);
     }
+
+    /**
+ * @Route("/supprime/produit/{id}", name="annonces_delete_produit", methods={"DELETE"})
+ */
+public function deletePro( JobProduct $produit, Request $request){
+    $data = json_decode($request->getContent(), true);
+
+    // On vérifie si le token est valide
+    if($this->isCsrfTokenValid('delete'.$produit->getId(), $data['_token'])){
+     
+
+        // On supprime l'entrée de la base
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($produit);
+        $em->flush();
+
+        // On répond en json
+        return new JsonResponse(['success' => 1]);
+    }else{
+        return new JsonResponse(['error' => 'Token Invalide'], 400);
+    }
+}
 
     /**
      * permet de supprimer un produit
@@ -908,6 +920,11 @@ class DashbordController extends AbstractController
         {
             $manager=$this->getDoctrine()->getManager();
             $pass = $encoder->encodePassword($addUser, $addUser->getPass());
+            foreach($addUserForm->get('userRoles')->getData() as $role){
+                    $r= new Role();
+                    $r->setRoleName($role);
+                    $addUser->addUserRole($r);
+            }
             $addUser->setPass($pass);
             $manager->persist($addUser); 
             $manager->flush();
@@ -930,7 +947,7 @@ class DashbordController extends AbstractController
      * @IsGranted("ROLE_USER")
      * @return Response
      */
-    public function editUser($id,$slug,UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function editUser($id,$slug,RoleRepository $roleRepo,UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
@@ -940,19 +957,50 @@ class DashbordController extends AbstractController
         if($editUserForm->isSubmitted() && $editUserForm->isValid())
         {
             $manager=$this->getDoctrine()->getManager();
+            $r= new Role();
+
+            $error=$roleRepo->findOneByRoleName($editUserForm->get('userRoles')->getData());
+            if( $error!=null){
+                $editUserForm->get('userRoles')->addError(new FormError("Cet utilisateur possède déja ce rôle"));
+            }else
+            {
+            $r->setRoleName($editUserForm->get('userRoles')->getData());
+            $editUser->addUserRole($r);
             $manager->persist($editUser); 
             $manager->flush();
             $this->addFlash(
                 'success',
-                "L'utilisateur ".$editUser->getFirstName()." ".$editUser->getLastName()." a bien été ajouté"
+                "L'utilisateur ".$editUser->getFirstName()." ".$editUser->getLastName()." a bien été modifié"
             );
             return $this-> redirectToRoute('user');
-        }   
+        }  } 
         return $this->render('dashbord/editUser.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
             'jobs' => $jobs,
+            'editUser' => $editUser,
             'editUserForm'=> $editUserForm->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/supprime/role/{id}", name="annonces_delete_role", methods={"DELETE"})
+     * @IsGranted("ROLE_USER")
+     */
+    public function deleteRole(Role $role, Request $request){
+        $data = json_decode($request->getContent(), true);
+
+        // On vérifie si le token est valide
+        if($this->isCsrfTokenValid('delete'.$role->getId(), $data['_token'])){
+            // On supprime l'entrée de la base
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($role);
+            $em->flush();
+
+            // On répond en json
+            return new JsonResponse(['success' => 1]);
+        }else{
+            return new JsonResponse(['error' => 'Token Invalide'], 400);
+        }
     }
 
     /**

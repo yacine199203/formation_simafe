@@ -8,7 +8,20 @@
                 <h2 class="my-2 " style="font-weight: 500;">Modifier un utilisateur</h2>
                 {{ form_start(editUserForm) }}
                 {{ form_widget(editUserForm) }}
-                <div class="modal-footer">
+                {% if app.request.attributes.get('_route') == 'editUser' %}
+                {% for eUser in editUser.userRoles %}
+                
+                <div class="row justify-content-between px-4 border-bottom mx-3 ">
+                    <h6 class="my-auto">{{eUser.RoleName}}</h6>
+    
+                    {# On ajoute un lien permettant de supprimer une image (sera géré en Ajax) #}
+                    <a href="{{ path('annonces_delete_role', {id: eUser.id})}}" data-delete
+                        data-token="{{ csrf_token('delete'~ eUser.id )}}" class="btn pr-0 btnmdsup delete"><i
+                            class="far fa-trash-alt"></i></a>
+                </div>
+                {% endfor %}
+                {% endif %}
+                <div class="modal-footer mt-3">
                     <button type="submit" class="btn btn-primary" style="font-size: 16px;">Modifier</button>
                 </div>
                 {{ form_end(editUserForm) }}
@@ -17,4 +30,40 @@
     </div>
 {% endblock %}
 {% block javascripts %}
+<script>
+    window.onload = () => {
+        // Gestion des boutons "Supprimer"
+        let links = document.querySelectorAll("[data-delete]")
+
+        // On boucle sur links
+        for (link of links) {
+            // On écoute le clic
+            link.addEventListener("click", function (e) {
+                // On empêche la navigation
+                e.preventDefault()
+
+                // On demande confirmation
+                if (confirm("Voulez-vous supprimer cette image ?")) {
+                    // On envoie une requête Ajax vers le href du lien avec la méthode DELETE
+                    fetch(this.getAttribute("href"), {
+                        method: "DELETE",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ "_token": this.dataset.token })
+                    }).then(
+                        // On récupère la réponse en JSON
+                        response => response.json()
+                    ).then(data => {
+                        if (data.success)
+                            this.parentElement.remove()
+                        else
+                            alert(data.error)
+                    }).catch(e => alert(e))
+                }
+            })
+        }
+    }
+</script>
 {% endblock %}

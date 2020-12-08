@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class EditUserType extends AbstractType
 {
@@ -31,6 +32,17 @@ class EditUserType extends AbstractType
             'attr'=>[
                 'placeholder'=>'exemple@email.com'    
             ]
+        ])
+        ->add('userRoles',ChoiceType::class,[
+            'label'=>'Rôle :',
+            'choices'  => [
+                'Administrateur' => 'Administrateur',
+                'Commercial' => 'Commercial',
+                'Client' => 'Client',
+            ],
+            'mapped'=>false,
+            'expanded'=>false,
+            'multiple'=>false,
         ])
         ;
     }

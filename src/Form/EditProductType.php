@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Product;
-use App\Form\JobProductType;
 use App\Form\CharacteristicsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,12 +12,12 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class ProductType extends AbstractType
+class EditProductType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('productName',TextType::class,[
+             ->add('productName',TextType::class,[
                 'label'=>'Produit :',
                 'attr'=>[
                     'placeholder'=>'Ex: Sigma'    
@@ -64,8 +63,8 @@ class ProductType extends AbstractType
                 'class'=>'App\Entity\Job',
                 'choice_label'=>'job',
                 'choice_value'=>'id',
-                'expanded'=>true,
-                'multiple'=>true,
+                'expanded'=>false,
+                'multiple'=>false,
                 'mapped'=>false,
             ])
             ->add('characteristics',CollectionType::class,
@@ -75,8 +74,6 @@ class ProductType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
             ])
-          
-     
         ;
     }
 

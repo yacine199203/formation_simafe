@@ -1,38 +1,48 @@
-
-
-{% block title %}
-
-{% endblock title %}
-
-
 {% block body %}
-    <div class="accordion menu-vertical shadow-sm " id="accordionExample">
-        {% for cat in categorys %}
-            <div class="card">
-                <div class="card-header p-0" id="headingTwo">
-                    <div class="row justify-content-between pl-3 pr-3">
-                        <a href="{{ path('categoryproduct',{'slug': cat.slug}) }}"style="margin: auto 0;" class="pl-2">
-                            {{cat.categoryName}}
-                        </a>
-                        <span class="p-2 btn-link heading" type="button" data-toggle="collapse" data-target="#h{{cat.id}}" aria-expanded="false" aria-controls="collapseTwo">
-                            <i class="fas fa-caret-down"></i>
-                        </span>
-                    </div>   
-                
-                </div>
-                <div id="h{{cat.id}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-                <div class="card-body">
-                    {% for product in cat.products %}
-                        <div class="my-2">
-                            <a href="{{path('productPresentation',{'slug': product.category.slug,'productSlug': product.slug})}}">
-                                {{ product.productName }}
-                            </a> 
-                        </div>
-                    {% endfor %}
-                </div>
-                </div>
+<div class="rounded shadow-sm border col-12 ">
+    {% for cat in categorys %}
+    {% for i in 1.. cat|length %}
+
+    <div class="toto">
+        <div class="tete px-1 row justify-content-between border " style="background-color:#eee">
+            <a href="{{ path('categoryproduct',{'slug': cat.slug}) }}" class="p-2 ">
+                <strong>{{cat.categoryName}}</strong>
+            </a>
+            <a href="#" class="p-2 slid" id="slid{{i}}"><i class="fas fa-plus text-primary"></i></a>
+        </div>
+        <div class="corp" id="corp{{i}}">
+            <div class="p-2  d-flex flex-column">
+                {% for product in cat.products %}
+                <a href="{{path('productPresentation',{'slug': product.category.slug,'productSlug': product.slug})}}"
+                    class="my-1">{{ product.productName }}</a>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
-    
+    {% endfor %}
+    {% endfor %}
+</div>
+
 {% endblock body %}
+
+{% block javascripts %}
+<script>
+    $('.corp').hide();
+
+    $('a.slid').each(function(l){
+        $(this).on('click', function (e) {
+            e.preventDefault();
+            if($(this).children('i').hasClass('fa-plus')){
+                $(this).parent().siblings('.corp').show('200');
+                $(this).children('i').removeClass('fa-plus');
+                $(this).children('i').addClass('fa-minus');
+            }else{
+                $(this).parent().siblings('.corp').hide('200');
+                $(this).children('i').removeClass('fa-minus');
+                $(this).children('i').addClass('fa-plus');   
+            }
+        });
+    })
+    
+</script>
+{% endblock %}

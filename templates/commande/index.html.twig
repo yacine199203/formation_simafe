@@ -1,7 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CommandeController!{% endblock %}
+{% block title %}Commandes{% endblock %}
+
+
 
 {% block body %}
+
+<div class="container">
+
+    <div class="row justify-content-center my-5">
+        <h1 style="font-weight: 500;">{{ 'Commandes'|upper }}</h1>
+    </div>
+    <div class="row justify-content-end mx-2">
+        <a href="{{path('cart')}}">
+            <button class="btn btn-primary my-2" type="button">
+                Voir mon panier
+            </button>
+        </a>
+    </div>
+    <div class="row mx-2 p-2 category" style="min-width: 900px;">
+        <div class="col-12">
+
+            <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
+                <div class="col-2 pl-0">
+                    <h6 style="font-weight: 800;">Réf</h6>
+                </div>
+                <div class="col-6 pl-0">
+                    <h6 style="font-weight: 800;">Client</h6>
+                </div>
+                <div class="col-2 pl-0">
+                    <h6 style="font-weight: 800;">date</h6>
+                </div>
+                <div class="col-2 pl-0">
+                </div>
+            </div>
+            {% for commande in commandes %}
+            <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
+                <div class="col-2 pl-0 align-self-center">
+                    <span>{{commande.ref}}</span>
+                </div>
+                <div class="col-6 pl-0 align-self-center">
+                    <span>{{commande.user.lastName}} {{commande.user.firstName}}</span>
+                </div>
+                <div class="col-2 pl-0 align-self-center">
+                    <span>{{commande.createdAt|date("d/m/Y")}}</span>
+                </div>
+                <div class="col-2 pl-0 align-self-center">
+                    <div>
+                        <a href="#">
+                            <button class="btn pr-0 btnmdsup"><i class="fas fa-edit"></i></button>
+                        </a>
+                        <a href="#" onclick="return confirm ('voulez vous vraiment supprimer cette commande')">
+                            <button class="btn pr-0 btnmdsup delete"><i class="far fa-trash-alt"></i></button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+</div>
+
 
 {% endblock %}

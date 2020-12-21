@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CommandeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 
@@ -48,6 +50,16 @@ class Commande
      * @ORM\Column(type="integer")
      */
     private $counter;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Cart::class, mappedBy="commande", orphanRemoval=true, cascade={"persist"})
+     */
+    private $carts;
+
+    public function __construct()
+    {
+        $this->carts = new ArrayCollection();
+    }
 
     /**
      * @ORM\PrePersist
@@ -125,6 +137,36 @@ class Commande
     public function setCounter(int $counter): self
     {
         $this->counter = $counter;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Cart[]
+     */
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): self
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts[] = $cart;
+            $cart->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): self
+    {
+        if ($this->carts->removeElement($cart)) {
+            // set the owning side to null (unless already changed)
+            if ($cart->getCommande() === $this) {
+                $cart->setCommande(null);
+            }
+        }
 
         return $this;
     }

@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Cart;
 use App\Entity\Commande;
 use App\Repository\JobRepository;
+use App\Repository\ProductRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\CommandeRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,22 +18,88 @@ class CommandeController extends AbstractController
     /**
      * @Route("/commande", name="commande")
      */
-    public function index(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    public function index(CategoryRepository $categoryRepo,JobRepository $jobRepo,CommandeRepository $commandeRepo,Request $request): Response
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
+        $commandes= $commandeRepo->findAll();
+        $session = $request->getSession();
         return $this->render('commande/index.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
             'jobs' => $jobs,
+            'commandes'=>$commandes,
+            'session'=>$session,
         ]);
     }
 
     /**
-     * @Route("/commande/ajouter", name="addCommande")
+     * @Route("/commande/panier", name="cart")
      */
-    public function addCommande(): Response
+    public function cart(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,ProductRepository $productRepo): Response
+    {
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        $session = $request->getSession();       
+        $cart = $session->get('cart',[]);
+        $inCart=[];
+        foreach($cart as $id=>$qty)
+        {
+            $inCart[]=[
+                'product'=>$productRepo->find($id),
+                'qty'=>$qty
+            ];
+        }
+        return $this->render('commande/cart.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'items' => $inCart,
+        ]);
+    }
+
+    /**
+     * @Route("/commande/panier/ajouter/{id}", name="addCart")
+     */
+    public function addCart($id,Request $request): Response
+    {
+        $session = $request->getSession();
+        $cart = $session->get('cart',[]);
+        if(!empty($cart[$id]))
+        {
+            $cart[$id]++;
+        }else
+        {
+            $cart[$id]=1;
+        }
+        $session->set('cart',$cart);
+        return $this-> redirectToRoute('cart'); 
+    }
+
+    /**
+     * @Route("/commande/panier/supprimer/{id}", name="removeCart")
+     */
+    public function removeCart($id,Request $request): Response
+    {
+        
+        $session = $request->getSession();
+        $cart = $session->get('cart',[]);
+        if(!empty($cart[$id]))
+        {
+            unset($cart[$id]);
+        }
+        $session->set('cart',$cart);
+        return $this-> redirectToRoute('cart'); 
+    }
+
+    /**
+     * @Route("/commande/ajouter/{product}/{qty}", name="addCommande")
+     */
+    public function addCommande($product,$qty,CommandeRepository $commandeRepo,Request $request): Response
     {
     
+        $p=explode(',',$product);
+        $q=explode(',',$qty);
+        $session = $request->getSession();
+        $commandes = $commandeRepo->findBy(array(), array('id' => 'DESC'));
         $commande= new Commande();
         $manager=$this->getDoctrine()->getManager();
         if(empty($commandes)){
@@ -43,10 +113,17 @@ class CommandeController extends AbstractController
         $commande->setRef($ref);
         $commande->setUser($this->getUser());
         $commande->setCounter($i+1);
+        
+        for($j=0;$j<count($p);$j++)
+        {
+        $inCart= new Cart();
+        $inCart->setProduct($p[$j]);
+        $inCart->setQte($q[$j]);
+        $commande->addCart($inCart);
+        }
         $manager->persist($commande);
         $manager->flush();
-
-        return $this->json(['code'=> 200, 'message'=>'ça marche',
-        'data'=>'super'],200);
+        $session->set('cart',[]);
+        return $this-> redirectToRoute('commande');
     }
 }

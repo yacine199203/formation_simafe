@@ -33,16 +33,15 @@ class EditUserType extends AbstractType
                 'placeholder'=>'exemple@email.com'    
             ]
         ])
-        ->add('userRoles',ChoiceType::class,[
-            'label'=>'Rôle :',
-            'choices'  => [
-                'Administrateur' => 'Administrateur',
-                'Commercial' => 'Commercial',
-                'Client' => 'Client',
+        ->add('roles',ChoiceType::class,[
+            'choices' => [
+               'Client' => 'ROLE_USER',
+               'Commercial' => 'ROLE_EDITOR',
+               'Administrateur' => 'ROLE_ADMIN'
             ],
-            'mapped'=>false,
-            'expanded'=>false,
-            'multiple'=>false,
+            'expanded' => true,
+            'multiple' => true,
+            'label' => 'Rôles :'
         ])
         ;
     }

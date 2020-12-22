@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma commande{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row my-5">
+        <div class="col-12 text-center">
+            <h1 style="font-weight: 500;">{{ 'commande n°: ' |upper }}{{showCommande.ref}}</h1>
+        </div>
+        <div class="col-12 text-center">
+            <h3 style="font-weight: 500;">{{showCommande.user.lastName}} {{showCommande.user.firstName}}</h3>
+        </div>
+        <div class="col-12 text-center">
+            <h5 style="font-weight: 500;">{{showCommande.createdAt|date("d/m/Y")}}</h5>
+        </div>
+    </div>
+
+    <div class="row mx-2 p-2 category" style="min-width: 900px;">
+        <div class="col-12">
+
+            <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
+                <div class="col-2 pl-0">
+                    <h6 style="font-weight: 800;">Réf</h6>
+                </div>
+                <div class="col-9 pl-0">
+                    <h6 style="font-weight: 800;">Produit</h6>
+                </div>
+                <div class="col-1 pl-0">
+                    <h6 style="font-weight: 800;">Qté</h6>
+                </div>
+
+
+            </div>
+
+            {% for item in showCommande.carts %}
+            <div class="row justify-content-between px-2 py-2 border-bottom mx-3 ">
+                <div class="col-2 pl-0">
+                    <span>{{item.id}}</span>
+                </div>
+                <div class="col-9 pl-0 align-self-center">
+                    <span>{{item.product}} </span>
+                </div>
+                <div class="col-1 pl-0 align-self-center">
+                    <span>{{item.qte}}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

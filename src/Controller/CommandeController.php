@@ -113,7 +113,7 @@ class CommandeController extends AbstractController
         $commande->setRef($ref);
         $commande->setUser($this->getUser());
         $commande->setCounter($i+1);
-        
+        $commande->setValid(false);
         for($j=0;$j<count($p);$j++)
         {
         $inCart= new Cart();
@@ -125,5 +125,61 @@ class CommandeController extends AbstractController
         $manager->flush();
         $session->set('cart',[]);
         return $this-> redirectToRoute('commande');
+    }
+
+    /**
+     * @Route("/commande/valider/{id}", name="validateCommande")
+     */
+    public function validateCommande($id,CommandeRepository $commandeRepo,Request $request): Response
+    {
+        $valid= $commandeRepo->findOneById($id);
+        $valid->setValid(true);
+        $manager=$this->getDoctrine()->getManager();
+        $manager->persist($valid);
+        $manager->flush();
+        return $this-> redirectToRoute('commande');
+    }
+
+    /**
+     * permet de voir une commande
+     * @Route("/commande/ma-commande/{id} ", name="showCommande")
+     * @return Response
+     */
+    public function showeCommande($id,CategoryRepository $categoryRepo,JobRepository $jobRepo,CommandeRepository $commandeRepo)
+    {   
+
+        $showCommande = $commandeRepo->findOneById($id);
+        $categorys = $categoryRepo->findAll();//drop-down nos produits
+        $jobs = $jobRepo->findAll();
+        
+        return $this->render('commande/showCommande.html.twig', [
+            'categorys' => $categorys, //drop-down nos produits
+            'jobs' => $jobs,
+            'showCommande' => $showCommande,
+        ]);       
+        
+    }
+
+    /**
+     * permet de supprimer une commande
+     * @Route("/commande/supprimer/{id} ", name="removeCommande")
+     * @return Response
+     */
+    public function removeCommande($id,CommandeRepository $commandeRepo)
+    {   
+
+        $removeCommande = $commandeRepo->findOneById($id);
+        if($removeCommande->getValid()== false)
+        {
+            $manager=$this->getDoctrine()->getManager();
+            $manager->remove($removeCommande); 
+            $manager->flush();
+            $this->addFlash(
+                'success',
+                "La commande ".$removeCommande->getRef()." a bien été supprimée "
+            );
+        }
+        return $this-> redirectToRoute('commande');         
+        
     }
 }

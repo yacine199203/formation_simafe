@@ -16,7 +16,9 @@
                             <a class="dropdown-item border-bottom " href="#">
                                 {{app.user.firstName}} {{app.user.lastName}}
                             </a>
+                            {% if is_granted('ROLE_ADMIN') %}
                             <a class="dropdown-item" href=" {{path('dashbord')}} ">Dashbord</a>
+                            {% endif %}
                             <a class="dropdown-item" href=" {{path('commande')}} ">Commande</a>
                             <a class="dropdown-item" href=" {{path('account_logout')}} ">Déconnexion</a>
 

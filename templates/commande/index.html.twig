@@ -18,6 +18,7 @@
             </button>
         </a>
     </div>
+
     <div class="row mx-2 p-2 category" style="min-width: 900px;">
         <div class="col-12">
 
@@ -34,8 +35,12 @@
                 <div class="col-2 pl-0">
                 </div>
             </div>
+            <div class="row justify-content-between border-bottom py-3 mx-2 ">
+                <input type="search" class="form-control" placeholder="Tapez une référence">
+            </div>
             {% for commande in commandes %}
-            <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
+            {% if (app.user == commande.user) or is_granted('ROLE_EDITOR') %}
+            <div class="row justify-content-between px-2 py-1 border-bottom mx-3 {% if (commande.valid == false) %}font-weight-bold {% endif %}">
                 <div class="col-2 pl-0 align-self-center">
                     <span>{{commande.ref}}</span>
                 </div>
@@ -47,15 +52,29 @@
                 </div>
                 <div class="col-2 pl-0 align-self-center">
                     <div>
-                        <a href="#">
-                            <button class="btn pr-0 btnmdsup"><i class="fas fa-edit"></i></button>
+
+                        <a href="{{path('showCommande',{'id': commande.id})}}">
+                            <button class="btn pr-0 btnmdsup"><i class="far fa-eye"></i></button>
                         </a>
-                        <a href="#" onclick="return confirm ('voulez vous vraiment supprimer cette commande')">
+                        
+                        {% if commande.valid == false %}
+                        <a href="{{path('removeCommande',{'id': commande.id})}}"
+                            onclick="return confirm ('voulez vous vraiment supprimer cette commande')">
                             <button class="btn pr-0 btnmdsup delete"><i class="far fa-trash-alt"></i></button>
                         </a>
+                        {% if is_granted('ROLE_EDITOR') %}
+                        <a href="{{path('validateCommande',{'id': commande.id})}}">
+                            <button class="btn pr-0 btnmdsup ">Valider</button>
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <span class="text-success ml-3"><i class="fas fa-check"></i></span>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>

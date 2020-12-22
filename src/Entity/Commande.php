@@ -56,6 +56,11 @@ class Commande
      */
     private $carts;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $valid;
+
     public function __construct()
     {
         $this->carts = new ArrayCollection();
@@ -167,6 +172,18 @@ class Commande
                 $cart->setCommande(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getValid(): ?bool
+    {
+        return $this->valid;
+    }
+
+    public function setValid(bool $valid): self
+    {
+        $this->valid = $valid;
 
         return $this;
     }

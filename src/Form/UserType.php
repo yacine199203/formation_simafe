@@ -40,16 +40,15 @@ class UserType extends AbstractType
                     'placeholder'=>'Mot de passe'    
                 ]
             ])
-            ->add('userRoles',ChoiceType::class,[
-                'label'=>'Rôle :',
-                'choices'  => [
-                    'Administrateur' => 'Administrateur',
-                    'Commercial' => 'Commercial',
-                    'Client' => 'Client',
+            ->add('roles',ChoiceType::class,[
+                'choices' => [
+                   'Client' => 'ROLE_USER',
+                   'Commercial' => 'ROLE_EDITOR',
+                   'Administrateur' => 'ROLE_ADMIN'
                 ],
-                'mapped'=>false,
-                'expanded'=>true,
-                'multiple'=>true,
+                'expanded' => true,
+                'multiple' => true,
+                'label' => 'Rôles :'
             ])
         ;
     }

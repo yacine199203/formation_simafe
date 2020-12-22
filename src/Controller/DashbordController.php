@@ -49,7 +49,7 @@ class DashbordController extends AbstractController
 
     /**
      * @Route("/dashbord", name="dashbord")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function index(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -65,7 +65,7 @@ class DashbordController extends AbstractController
 
     /**
      * @Route("/dashbord/categorie", name="category")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showCategory(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -80,7 +80,7 @@ class DashbordController extends AbstractController
     /**
      * permet d'ajouter une catégorie 
      * @Route("/dashbord/ajouter-categorie", name="addCategory")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addCategory(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -128,7 +128,7 @@ class DashbordController extends AbstractController
     /**
      * permet de modifier une catégorie
      * @Route("/dashbord/modifier-categorie/{categoryName} ", name="editCategory")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function editCategory($categoryName,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -176,7 +176,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer une catégorie
      * @Route("/dashbord/supprimer-categorie/{categoryName} ", name="removeCategory")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeCategory($categoryName,CategoryRepository $categoryRepo,ProductRepository $productRepo)
@@ -215,7 +215,7 @@ class DashbordController extends AbstractController
     /**
      * permet de voir la page des sliders
      * @Route("/dashbord/sliders", name="sliders")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showSliders(CategoryRepository $categoryRepo,JobRepository $jobRepo,SlidersRepository $slidersRepo): Response
     {
@@ -233,7 +233,7 @@ class DashbordController extends AbstractController
     /**
      * permet d'ajouter un slider
      * @Route("/dashbord/ajouter-slid", name="addSlid")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addSlid(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -285,7 +285,7 @@ class DashbordController extends AbstractController
     /**
      * permet de supprimer un slid
      * @Route("/dashbord/supprimer-slid/{image} ", name="removeSlid")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeSlid($image,SlidersRepository $slidersRepo)
@@ -311,7 +311,7 @@ class DashbordController extends AbstractController
     /**
      * permet de voir la page des produits
      * @Route("/dashbord/produits", name="products")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showProducts(CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo): Response
     {
@@ -328,7 +328,7 @@ class DashbordController extends AbstractController
     /**
       * permet d'ajouter un produit
      * @Route("/dashbord/ajouter-produit", name="addProduct")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addProduct(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -411,7 +411,7 @@ class DashbordController extends AbstractController
     /**
      * permet de modifier un produit
      * @Route("/dashbord/modifier-produit/{productName} ", name="editProduct")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function editprod($productName,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo,Request $request)
@@ -522,7 +522,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer un produit
      * @Route("/dashbord/supprimer-produit/{image} ", name="removeProduct")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeProduct($image,ProductRepository $productRepo)
@@ -559,7 +559,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/dashbord/metier", name="job")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -574,7 +574,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet d'ajouter un métier 
      * @Route("/dashbord/ajouter-metier", name="addJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -629,7 +629,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de modifier un métier
      * @Route("/dashbord/modifier-metier/{job} ", name="editJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function editJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -680,7 +680,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer un métier
      * @Route("/dashbord/supprimer-metier/{job} ", name="removeJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -709,7 +709,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/realisation ", name="productionJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showProductionJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -726,7 +726,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet d'ajouter une réalisation
      * @Route("/dashbord/ajouter-realisation", name="addProductionJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addProductionJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -784,7 +784,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de modifier une réalisation
      * @Route("/dashbord/modifier-realisation/{slug}", name="editProductionJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function editProductionJob($slug,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductionJobRepository $productionJobRepo,Request $request)
@@ -834,7 +834,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/supprime/image/{id}", name="annonces_delete_image", methods={"DELETE"})
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function deleteImage(ProductionImage $image, Request $request){
         $data = json_decode($request->getContent(), true);
@@ -861,7 +861,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer une catégorie
      * @Route("/dashbord/supprimer-Pj/{id} ", name="removeProductionJob")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeProductionJob($id,ProductionJobRepository $productionJobRepo)
@@ -889,7 +889,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/dashbord/utilisateur", name="user")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showUser(UserRepository $userRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -906,7 +906,7 @@ public function deletePro( JobProduct $produit, Request $request){
      /**
      * permet d'ajouter un utilisateur 
      * @Route("/dashbord/ajouter-utilisateur", name="addUser")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addUser(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,UserPasswordEncoderInterface $encoder)
@@ -920,11 +920,7 @@ public function deletePro( JobProduct $produit, Request $request){
         {
             $manager=$this->getDoctrine()->getManager();
             $pass = $encoder->encodePassword($addUser, $addUser->getPass());
-            foreach($addUserForm->get('userRoles')->getData() as $role){
-                    $r= new Role();
-                    $r->setRoleName($role);
-                    $addUser->addUserRole($r);
-            }
+           
             $addUser->setPass($pass);
             $manager->persist($addUser); 
             $manager->flush();
@@ -944,10 +940,10 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de modifier un utilisateur 
      * @Route("/dashbord/modifier-utilisateur/{id}/{slug}", name="editUser")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function editUser($id,$slug,RoleRepository $roleRepo,UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function editUser($id,$slug,UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
@@ -957,15 +953,6 @@ public function deletePro( JobProduct $produit, Request $request){
         if($editUserForm->isSubmitted() && $editUserForm->isValid())
         {
             $manager=$this->getDoctrine()->getManager();
-            $r= new Role();
-
-            $error=$roleRepo->findOneByRoleName($editUserForm->get('userRoles')->getData());
-            if( $error!=null){
-                $editUserForm->get('userRoles')->addError(new FormError("Cet utilisateur possède déja ce rôle"));
-            }else
-            {
-            $r->setRoleName($editUserForm->get('userRoles')->getData());
-            $editUser->addUserRole($r);
             $manager->persist($editUser); 
             $manager->flush();
             $this->addFlash(
@@ -973,7 +960,7 @@ public function deletePro( JobProduct $produit, Request $request){
                 "L'utilisateur ".$editUser->getFirstName()." ".$editUser->getLastName()." a bien été modifié"
             );
             return $this-> redirectToRoute('user');
-        }  } 
+        }  
         return $this->render('dashbord/editUser.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
             'jobs' => $jobs,
@@ -983,30 +970,9 @@ public function deletePro( JobProduct $produit, Request $request){
     }
 
     /**
-     * @Route("/supprime/role/{id}", name="annonces_delete_role", methods={"DELETE"})
-     * @IsGranted("ROLE_USER")
-     */
-    public function deleteRole(Role $role, Request $request){
-        $data = json_decode($request->getContent(), true);
-
-        // On vérifie si le token est valide
-        if($this->isCsrfTokenValid('delete'.$role->getId(), $data['_token'])){
-            // On supprime l'entrée de la base
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($role);
-            $em->flush();
-
-            // On répond en json
-            return new JsonResponse(['success' => 1]);
-        }else{
-            return new JsonResponse(['error' => 'Token Invalide'], 400);
-        }
-    }
-
-    /**
      * permet de modifier le mot de passe utilisateur 
      * @Route("/dashbord/modifier-mot-de-passe", name="updatePass")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function updatePass(UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,UserPasswordEncoderInterface $encoder)
@@ -1052,7 +1018,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer un utilisateur
      * @Route("/dashbord/supprimer-utilisatuer/{id} ", name="removeUser")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeUser($id,UserRepository $userJobRepo)
@@ -1076,7 +1042,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/dashbord/newsletter", name="newsletter")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showNewsletter(NewsletterRepository $newsletterRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -1092,7 +1058,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/dashbord/newsletter/emails", name="emails")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function emails(NewsletterRepository $newsletterRepo): Response
     {
@@ -1105,7 +1071,7 @@ public function deletePro( JobProduct $produit, Request $request){
 
     /**
      * @Route("/dashbord/newsletter/{id}", name="subscriber")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showsubscriber($id,NewsletterRepository $newsletterRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request): Response
     {
@@ -1152,7 +1118,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer un abonné
      * @Route("/dashbord/supprimer-abonne/{id} ", name="removeSubscribers")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeSubscribers($id,NewsletterRepository $newsletterRepo)
@@ -1174,7 +1140,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer un abonné
      * @Route("/dashbord/supprimer-tous-les-abonnes ", name="removeSubAll")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeAllSuscr(NewsletterRepository $newsletterRepo)
@@ -1204,7 +1170,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * voir recrutement
      * @Route("/dashbord/recrutement", name="showRecruitment")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function showRec(RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
     {
@@ -1221,7 +1187,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet d'ajouter une offre d'emploi 
      * @Route("/dashbord/ajouter-offre-d-emploi", name="addRec")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function addRec(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -1258,7 +1224,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de modifier une offre d'emploi 
      * @Route("/dashbord/modifier-offre-d-emploi/{id}", name="editRec")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function editRec($id,RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
@@ -1294,7 +1260,7 @@ public function deletePro( JobProduct $produit, Request $request){
     /**
      * permet de supprimer une offre d'emploi
      * @Route("/dashbord/supprimer-offre-d-emploi/{id} ", name="removeRec")
-     * @IsGranted("ROLE_USER")
+     * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
     public function removeRec($id,RecruitementRepository $recruitementRepo)

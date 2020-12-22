@@ -58,24 +58,24 @@ class User implements UserInterface
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity=Role::class, mappedBy="user", orphanRemoval=true, cascade={"persist"})
-     */
-    private $userRoles;
-
-    /**
      * @ORM\OneToMany(targetEntity=Commande::class, mappedBy="user", orphanRemoval=true)
      */
     private $commandes;
 
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
+
     public function __construct()
     {
-        $this->userRoles = new ArrayCollection();
         $this->commandes = new ArrayCollection();
     }
 
 
 
-     /** 
+    /** 
     *@ORM\PrePersist
     *@ORM\PreUpdate
     *@return void 
@@ -152,9 +152,21 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        $roles = $this->roles;
+    // garantit que chaque utilisateur possède le rôle ROLE_USER
+    // équvalent à array_push() qui ajoute un élément au tabeau
+          $roles[] = 'ROLE_USER'; 
+    //array_unique élémine des doublons      
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     public function getPassword()
@@ -170,36 +182,6 @@ class User implements UserInterface
     }
 
     public function eraseCredentials(){}
-
-    /**
-     * @return Collection|Role[]
-     */
-    public function getUserRoles(): Collection
-    {
-        return $this->userRoles;
-    }
-
-    public function addUserRole(Role $userRole): self
-    {
-        if (!$this->userRoles->contains($userRole)) {
-            $this->userRoles[] = $userRole;
-            $userRole->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserRole(Role $userRole): self
-    {
-        if ($this->userRoles->removeElement($userRole)) {
-            // set the owning side to null (unless already changed)
-            if ($userRole->getUser() === $this) {
-                $userRole->setUser(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|Commande[]

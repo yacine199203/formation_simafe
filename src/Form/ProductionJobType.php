@@ -11,6 +11,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class ProductionJobType extends AbstractType
@@ -41,8 +42,10 @@ class ProductionJobType extends AbstractType
                 'mapped'=> false,
                 'required'=> false,
                 'multiple'=> true,
-                
-
+            ])
+            ->add('description',HiddenType::class,[
+                'mapped'=> false,
+                'required'=> false,
             ])
         ;
     }

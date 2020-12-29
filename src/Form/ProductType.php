@@ -11,6 +11,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class ProductType extends AbstractType
@@ -74,6 +75,10 @@ class ProductType extends AbstractType
                 'entry_type' => CharacteristicsType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
+            ])
+            ->add('description',HiddenType::class,[
+                'mapped'=> false,
+                'required'=> false,
             ])
           
      

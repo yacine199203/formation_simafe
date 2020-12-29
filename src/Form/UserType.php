@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class UserType extends AbstractType
@@ -49,6 +50,10 @@ class UserType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Rôles :'
+            ])
+            ->add('description',HiddenType::class,[
+                'mapped'=> false,
+                'required'=> false,
             ])
         ;
     }

@@ -53,7 +53,7 @@
                             Nos produits
                         </a>
                         <div class="dropdown-menu mt-3 pr-5" aria-labelledby="navbarDropdown">
-                            {% for category in categorys %}
+                            {% for category in header.categorys %}
                             <a class="dropdown-item"
                                 href=" {{path('categoryproduct',{'slug': category.slug })}} ">{{category.categoryName}}</a>
                             {% endfor %}
@@ -67,7 +67,7 @@
                             Nos réalisations
                         </a>
                         <div class="dropdown-menu mt-3 pr-5" aria-labelledby="navbarDropdown">
-                            {% for jb in jobs %}
+                            {% for jb in header.jobs %}
                             <a class="dropdown-item" href=" {{path('production',{'slug': jb.slug })}} "> Agencement pour
                                 {{jb.job|capitalize}}</a>
                             {% endfor %}

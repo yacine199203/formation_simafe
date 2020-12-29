@@ -90,7 +90,7 @@ class DashbordController extends AbstractController
         $addCategory = new Category();
         $addCatForm = $this->createForm(CategoryType::class,$addCategory);
         $addCatForm-> handleRequest($request);
-        if($addCatForm->isSubmitted() && $addCatForm->isValid())
+        if($addCatForm->isSubmitted() && $addCatForm->isValid() && empty($addCatForm->get('description')->getData()))
         {
             $file= $addCatForm->get('image')->getData();
             if($file != null)
@@ -138,7 +138,7 @@ class DashbordController extends AbstractController
         $editCategory = $categoryRepo->findOneBySlug($categoryName);
         $editCatForm = $this->createForm(CategoryType::class,$editCategory);
         $editCatForm-> handleRequest($request);
-        if($editCatForm->isSubmitted() && $editCatForm->isValid())
+        if($editCatForm->isSubmitted() && $editCatForm->isValid() && empty($editCatForm->get('description')->getData()))
         {
             $file= $editCatForm->get('image')->getData();
             if($file != null)
@@ -313,10 +313,8 @@ class DashbordController extends AbstractController
      * @Route("/dashbord/produits", name="products")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function showProducts(CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo): Response
+    public function showProducts(ProductRepository $productRepo): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $products = $productRepo->findAll();
         return $this->render('/dashbord/showProduct.html.twig', [
             'categorys' => $categorys, //drop-down nos produits
@@ -333,12 +331,11 @@ class DashbordController extends AbstractController
      */
     public function addProduct(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
         $addProduct = new Product();
         $addProdForm = $this->createForm(ProductType::class,$addProduct);
         $addProdForm-> handleRequest($request);
-        if($addProdForm->isSubmitted() && $addProdForm->isValid())
+        if($addProdForm->isSubmitted() && $addProdForm->isValid() && empty($addProdForm->get('description')->getData()))
         {
             
             $filePng= $addProdForm->get('png')->getData();
@@ -401,7 +398,6 @@ class DashbordController extends AbstractController
             } 
         }
         return $this->render('dashbord/addProduct.html.twig', [
-            'categorys'=> $categorys,//drop-down nos produits
             'jobs'=> $jobs,//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
             'addProdForm'=> $addProdForm->createView(),
             
@@ -414,13 +410,13 @@ class DashbordController extends AbstractController
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function editprod($productName,CategoryRepository $categoryRepo,JobRepository $jobRepo,ProductRepository $productRepo,Request $request)
-    {   $categorys = $categoryRepo->findAll();//drop-down nos produits
+    public function editprod($productName,JobRepository $jobRepo,ProductRepository $productRepo,Request $request)
+    {   
         $jobs = $jobRepo->findAll();
         $editProduct = $productRepo->findOneBySlug($productName);
         $editProdForm = $this->createForm(EditProductType::class,$editProduct);
         $editProdForm-> handleRequest($request);
-        if($editProdForm->isSubmitted() && $editProdForm->isValid())
+        if($editProdForm->isSubmitted() && $editProdForm->isValid()&& empty($editProdForm->get('description')->getData()))
         {
             $filePng= $editProdForm->get('png')->getData();
             $filePdf= $editProdForm->get('pdf')->getData();
@@ -489,7 +485,6 @@ class DashbordController extends AbstractController
             }
         }
         return $this->render('dashbord/editProduct.html.twig', [
-            'categorys'=> $categorys,//drop-down nos produits
             'jobs'=> $jobs,//pour bloquer l'ajout d'une relation métier/ produit si la table métier est vide 
             'editProduct'=> $editProduct,
             'editProdForm'=> $editProdForm->createView(),
@@ -561,12 +556,10 @@ public function deletePro( JobProduct $produit, Request $request){
      * @Route("/dashbord/metier", name="job")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function showJob(CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    public function showJob(JobRepository $jobRepo): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
         return $this->render('/dashbord/showJob.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
             'jobs' => $jobs,
         ]);
     }
@@ -577,14 +570,12 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function addJob(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function addJob(Request $request)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $addJob = new Job();
         $addJobForm = $this->createForm(JobType::class,$addJob);
         $addJobForm-> handleRequest($request);
-        if($addJobForm->isSubmitted() && $addJobForm->isValid())
+        if($addJobForm->isSubmitted() && $addJobForm->isValid() && empty($addJobForm->get('description')->getData()))
         {
             $file= $addJobForm->get('image')->getData();
             if($file == null)
@@ -617,11 +608,7 @@ public function deletePro( JobProduct $produit, Request $request){
                 return $this-> redirectToRoute('job');
             }    
         }
-    
-        
         return $this->render('dashbord/addJob.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'addJobForm'=> $addJobForm->createView(),
         ]);
     }
@@ -632,14 +619,14 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function editJob($job,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function editJob($job,JobRepository $jobRepo,Request $request)
     {   
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
         $editJob = $jobRepo->findOneBySlug($job);
         $editJobForm = $this->createForm(JobType::class,$editJob);
         $editJobForm-> handleRequest($request);
-        if($editJobForm->isSubmitted() && $editJobForm->isValid())
+        if($editJobForm->isSubmitted() && $editJobForm->isValid() && empty($editJobForm->get('description')->getData()))
         {
             $file= $editJobForm->get('image')->getData();
             if($file != null)
@@ -671,7 +658,6 @@ public function deletePro( JobProduct $produit, Request $request){
     
         
         return $this->render('dashbord/editJob.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
             'jobs' => $jobs,
             'editJobForm'=> $editJobForm->createView(),
         ]);
@@ -736,7 +722,7 @@ public function deletePro( JobProduct $produit, Request $request){
         $addProductionJob = new ProductionJob();
         $addProductionJobForm = $this->createForm(ProductionJobType::class,$addProductionJob);
         $addProductionJobForm-> handleRequest($request);
-        if($addProductionJobForm->isSubmitted() && $addProductionJobForm->isValid())
+        if($addProductionJobForm->isSubmitted() && $addProductionJobForm->isValid() && empty($addProductionJobForm->get('description')->getData()))
         {
             $imgs= $addProductionJobForm->get('image')->getData();
             if($imgs == null)
@@ -794,7 +780,7 @@ public function deletePro( JobProduct $produit, Request $request){
         $editProductionJob = $productionJobRepo->findOneBySlug($slug);
         $editProductionJobForm = $this->createForm(ProductionJobType::class,$editProductionJob);
         $editProductionJobForm-> handleRequest($request);
-        if($editProductionJobForm->isSubmitted() && $editProductionJobForm->isValid())
+        if($editProductionJobForm->isSubmitted() && $editProductionJobForm->isValid() && empty($editProductionJobForm->get('description')->getData()))
         {
             $imgs= $editProductionJobForm->get('image')->getData();
             foreach($imgs as $img){
@@ -891,14 +877,11 @@ public function deletePro( JobProduct $produit, Request $request){
      * @Route("/dashbord/utilisateur", name="user")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function showUser(UserRepository $userRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    public function showUser(UserRepository $userRepo): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
+   
         $users = $userRepo->findAll();
         return $this->render('/dashbord/showUser.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'users' => $users,
         ]);
     }
@@ -909,14 +892,12 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function addUser(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,UserPasswordEncoderInterface $encoder)
+    public function addUser(Request $request,UserPasswordEncoderInterface $encoder)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $addUser = new User();
         $addUserForm = $this->createForm(UserType::class,$addUser);
         $addUserForm-> handleRequest($request);
-        if($addUserForm->isSubmitted() && $addUserForm->isValid())
+        if($addUserForm->isSubmitted() && $addUserForm->isValid() && empty($addUserForm->get('description')->getData()))
         {
             $manager=$this->getDoctrine()->getManager();
             $pass = $encoder->encodePassword($addUser, $addUser->getPass());
@@ -931,8 +912,6 @@ public function deletePro( JobProduct $produit, Request $request){
             return $this-> redirectToRoute('user');
         }   
         return $this->render('dashbord/addUser.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'addUserForm'=> $addUserForm->createView(),
         ]);
     }
@@ -943,14 +922,12 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function editUser($id,$slug,UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function editUser($id,$slug,UserRepository $userRepo,Request $request)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $editUser = $userRepo->findOneByid($id);
         $editUserForm = $this->createForm(EditUserType::class,$editUser);
         $editUserForm-> handleRequest($request);
-        if($editUserForm->isSubmitted() && $editUserForm->isValid())
+        if($editUserForm->isSubmitted() && $editUserForm->isValid() && empty($editUserForm->get('description')->getData()))
         {
             $manager=$this->getDoctrine()->getManager();
             $manager->persist($editUser); 
@@ -962,8 +939,6 @@ public function deletePro( JobProduct $produit, Request $request){
             return $this-> redirectToRoute('user');
         }  
         return $this->render('dashbord/editUser.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'editUser' => $editUser,
             'editUserForm'=> $editUserForm->createView(),
         ]);
@@ -975,10 +950,8 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function updatePass(UserRepository $userRepo, CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request,UserPasswordEncoderInterface $encoder)
+    public function updatePass(UserRepository $userRepo,Request $request,UserPasswordEncoderInterface $encoder)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $user= $this->getUser();
         $updatePass= new UpdatePass();
         $updatePassForm = $this->createForm(UpdatePassType::class,$updatePass);
@@ -1008,8 +981,6 @@ public function deletePro( JobProduct $produit, Request $request){
             
         }   
         return $this->render('dashbord/updatePass.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'updatePassForm'=> $updatePassForm->createView(),
         ]);
     }
@@ -1044,14 +1015,10 @@ public function deletePro( JobProduct $produit, Request $request){
      * @Route("/dashbord/newsletter", name="newsletter")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function showNewsletter(NewsletterRepository $newsletterRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    public function showNewsletter(NewsletterRepository $newsletterRepo): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $subscribers = $newsletterRepo->findAll();
         return $this->render('/dashbord/showNewsletter.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'subscribers' => $subscribers,
         ]);
     }
@@ -1138,7 +1105,7 @@ public function deletePro( JobProduct $produit, Request $request){
     }
 
     /**
-     * permet de supprimer un abonné
+     * permet de supprimer tous les abonnés 
      * @Route("/dashbord/supprimer-tous-les-abonnes ", name="removeSubAll")
      * @IsGranted("ROLE_ADMIN")
      * @return Response
@@ -1172,14 +1139,10 @@ public function deletePro( JobProduct $produit, Request $request){
      * @Route("/dashbord/recrutement", name="showRecruitment")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function showRec(RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo): Response
+    public function showRec(RecruitementRepository $recruitementRepo): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $recruitement = $recruitementRepo->findAll();
         return $this->render('/dashbord/showRecruitement.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'recruitement' => $recruitement,
         ]);
     }
@@ -1190,14 +1153,12 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function addRec(CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function addRec(Request $request)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $addRec = new Recruitement();
         $addRecForm = $this->createForm(RecruitementType::class,$addRec);
         $addRecForm-> handleRequest($request);
-        if($addRecForm->isSubmitted() && $addRecForm->isValid())
+        if($addRecForm->isSubmitted() && $addRecForm->isValid() && empty($addRecForm->get('description')->getData()))
         {
             $manager=$this->getDoctrine()->getManager();
             foreach ($addRec->getConditions() as $cond)
@@ -1214,8 +1175,6 @@ public function deletePro( JobProduct $produit, Request $request){
             return $this-> redirectToRoute('showRecruitment');
         }   
         return $this->render('dashbord/addRecruitement.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'addRecForm'=> $addRecForm->createView(),
         ]);
     }
@@ -1227,14 +1186,14 @@ public function deletePro( JobProduct $produit, Request $request){
      * @IsGranted("ROLE_ADMIN")
      * @return Response
      */
-    public function editRec($id,RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request)
+    public function editRec($id,RecruitementRepository $recruitementRepo,Request $request)
     {
         $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findAll();
         $editRec = $recruitementRepo->findOneById($id);
         $editRecForm = $this->createForm(RecruitementType::class,$editRec);
         $editRecForm-> handleRequest($request);
-        if($editRecForm->isSubmitted() && $editRecForm->isValid())
+        if($editRecForm->isSubmitted() && $editRecForm->isValid() && empty($editRecForm->get('description')->getData()))
         {
             $manager=$this->getDoctrine()->getManager();
             foreach ($editRec->getConditions() as $cond)
@@ -1251,8 +1210,6 @@ public function deletePro( JobProduct $produit, Request $request){
             return $this-> redirectToRoute('showRecruitment');
         }   
         return $this->render('dashbord/editRecruitement.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'editRecForm'=> $editRecForm->createView(),
         ]);
     }

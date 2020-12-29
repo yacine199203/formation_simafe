@@ -18,15 +18,12 @@ class CommandeController extends AbstractController
     /**
      * @Route("/commande", name="commande")
      */
-    public function index(CategoryRepository $categoryRepo,JobRepository $jobRepo,CommandeRepository $commandeRepo,Request $request): Response
+    public function index(CommandeRepository $commandeRepo,Request $request): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
-        $commandes= $commandeRepo->findAll();
+        $commandes= $commandeRepo->findBy(array(), array('ref' => 'DESC'));
         $session = $request->getSession();
+
         return $this->render('commande/index.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'commandes'=>$commandes,
             'session'=>$session,
         ]);
@@ -181,5 +178,27 @@ class CommandeController extends AbstractController
         }
         return $this-> redirectToRoute('commande');         
         
+    }
+
+    /**
+     * @Route("/commande/{result}", name="commande_result")
+     */
+    public function commandeSearch($result,CommandeRepository $commandeRepo): Response
+    {
+        $manager=$this->getDoctrine()->getManager();
+        $commandes= $manager->createQuery('SELECT c FROM App\Entity\Commande c WHERE c.ref LIKE \'%'.$result.'%\'')->getResult();
+        $test=[];
+        foreach($commandes as $commande)
+        {
+            $test[]=[
+                'id'=> $commande->getId(),
+                'ref'=> $commande->getRef(),
+                'user'=> $commande->getUser()->getLastName().' '.$commande->getUser()->getFirstName(),
+                'date'=> $commande->getCreatedAt()->format("d/m/Y"), 
+                'valid'=> $commande->getValid(),
+            ];
+        }
+        return $this->json(['code'=> 200, 'message'=>'ça marche',
+        'data'=>$test],200);
     }
 }

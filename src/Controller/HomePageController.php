@@ -9,7 +9,6 @@ use App\Repository\JobRepository;
 use App\Repository\ProductRepository;
 use App\Repository\SlidersRepository;
 use App\Repository\CategoryRepository;
-use Doctrine\Persistence\ObjectManager;
 use App\Repository\JobProductRepository;
 use App\Repository\NewsletterRepository;
 use App\Repository\RecruitementRepository;
@@ -23,12 +22,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class HomePageController extends AbstractController
 {
     /**
+     * page d'acceuil
      * @Route("/", name="homePage")
      */
-    public function index(Request $request,CategoryRepository $categoryRepo,SlidersRepository $slidersRepo,JobRepository $jobRepo): Response
+    public function index(Request $request,SlidersRepository $slidersRepo): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $sliders = $slidersRepo->findAll();
         $newsletter = new Newsletter();
         $newsletterForm = $this->createForm(NewsletterType::class,$newsletter);
@@ -43,9 +41,7 @@ class HomePageController extends AbstractController
             return $this-> redirectToRoute('homePage');
         }   
         return $this->render('home.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
             'sliders' => $sliders,
-            'jobs' => $jobs,
             'newsletterForm'=> $newsletterForm->createView(),
         ]);
     }
@@ -54,10 +50,8 @@ class HomePageController extends AbstractController
      * permet de se désabonner de la newsletter
      * @Route("/se-desabonner", name="unsubscribeNewsletter")
      */
-    public function showNewsletter(NewsletterRepository $newsletterRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo,Request $request): Response
+    public function showNewsletter(NewsletterRepository $newsletterRepo,Request $request): Response
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $defaultData = ['message' => 'Type your message here'];
         $form = $this->createFormBuilder($defaultData)
             ->add('email', EmailType::class,['label' => 'Email :','attr'=>[
@@ -72,7 +66,7 @@ class HomePageController extends AbstractController
             $unsubscribe = $newsletterRepo->findOneByEmail($customer);
             if($unsubscribe==null)
             {
-                $compare ='null';
+                $compare = null;
             }else{
                 $compare =$unsubscribe->getEmail();
             }
@@ -95,8 +89,6 @@ class HomePageController extends AbstractController
             }
         }
         return $this->render('/unsubscribe.html.twig', [
-            'categorys' => $categorys, //drop-down nos produits
-            'jobs' => $jobs,
             'form'=> $form->createView(),
         ]);
     }
@@ -107,14 +99,10 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function recruitement(RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    public function recruitement(RecruitementRepository $recruitementRepo)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $recruitement = $recruitementRepo->findAll();
         return $this->render('recruitement.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
-            'jobs' => $jobs,
             'recruitement' => $recruitement,
         ]);
     }
@@ -124,14 +112,11 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function conditions($id,RecruitementRepository $recruitementRepo,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    public function conditions($id,RecruitementRepository $recruitementRepo)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
+        
         $recruitement = $recruitementRepo->findOneById($id);
         return $this->render('conditions.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
-            'jobs' => $jobs,
             'recruitement' => $recruitement,
         ]);
     }
@@ -142,10 +127,8 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function search(ProductRepository $productRepo,Request $request,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    public function search(ProductRepository $productRepo,Request $request)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $form = $this->createForm(ProductSearchType::class);
         $form-> handleRequest($request);
         $product=null;
@@ -162,8 +145,6 @@ class HomePageController extends AbstractController
             }
         }
         return $this->render('search.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
-            'jobs' => $jobs,
             'product' => $product,
             'result'=>$result,
             'message'=>$message,
@@ -179,15 +160,11 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function showCategoryProduct($slug,CategoryRepository $categoryRepo,JobRepository $jobRepo)
+    public function showCategoryProduct($slug,CategoryRepository $categoryRepo)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
         $category = $categoryRepo->findOneBySlug($slug);
-        $jobs = $jobRepo->findAll();
         return $this->render('categoryProductList.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
             'category'=> $category,
-            'jobs' => $jobs,
         ]);
     }
 
@@ -198,17 +175,13 @@ class HomePageController extends AbstractController
      * 
      * @return Response
      */
-    public function showProductPresentation($slug,$productSlug,CategoryRepository $categoryRepo,ProductRepository $productRepo,JobRepository $jobRepo)
+    public function showProductPresentation($slug,$productSlug,CategoryRepository $categoryRepo,ProductRepository $productRepo)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
-        $jobs = $jobRepo->findAll();
         $category = $categoryRepo->findOneBySlug($slug);
         $product=$productRepo->findOneBySlug($productSlug);
         return $this->render('productPresentation.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
             'category'=> $category,
             'product'=> $product,
-            'jobs'=> $jobs,
         ]);
     }
 
@@ -220,12 +193,10 @@ class HomePageController extends AbstractController
      */
     public function showJobProduct($metier,CategoryRepository $categoryRepo,JobRepository $jobRepo,JobProductRepository $jpRepo,ProductRepository $productRepo)
     {
-        $categorys = $categoryRepo->findAll();//drop-down nos produits
         $jobs = $jobRepo->findOneBySlug($metier);
         $jps = $jpRepo->findAll();
         $products =$productRepo->findAll();
         return $this->render('jobProductList.html.twig', [
-            'categorys' => $categorys,//drop-down nos produits
             'jobs'=> $jobs,
             'jps'=> $jps,
             'products'=> $products,

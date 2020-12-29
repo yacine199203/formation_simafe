@@ -7,14 +7,16 @@
 {% block body %}
 
 <div class="container">
-
     <div class="row justify-content-center my-5">
         <h1 style="font-weight: 500;">{{ 'Mon panier'|upper }}</h1>
     </div>
-
+    {% if app.session.get('cart') is empty %}
+    <div class="row justify-content-center my-5">
+        <h3 style="font-weight: 500;">{{ 'Le panier est vide' }}</h3>
+    </div>
+    {% else %}
     <div class="row mx-2 p-2 category" style="min-width: 900px;">
         <div class="col-12">
-
             <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
                 <div class="col-2 pl-0">
                     <h6 style="font-weight: 800;">Réf</h6>
@@ -26,9 +28,7 @@
                     <h6 style="font-weight: 800;">Qté</h6>
                 </div>
                 <div class="col-1 pl-0"></div>
-
             </div>
-
             {% for item in items %}
             <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
                 <div class="col-2 pl-0">
@@ -54,18 +54,13 @@
         </div>
     </div>
     <div class="row mx-2">
-        {% if app.session.get('cart') is empty %}
-        <div class="row justify-content-end mx-2">
-            <span class="btn btn-outline-dark my-2">Panier vide</span>
-        </div>
-        {% else %}
         <a href="#" id="valider">
             <button class="btn btn-primary my-2" type="button">
                 Commander
             </button>
         </a>
-        {% endif %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 {% block javascripts %}

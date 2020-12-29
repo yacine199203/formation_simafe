@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ContactType extends AbstractType
@@ -40,6 +41,10 @@ class ContactType extends AbstractType
             'attr'=>[ 
                 'placeholder'=>'Ex: image.png', 
             ]
+        ])
+        ->add('description',HiddenType::class,[
+            'mapped'=> false,
+            'required'=> false,
         ])
         ;
     }

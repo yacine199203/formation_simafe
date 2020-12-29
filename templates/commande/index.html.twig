@@ -18,8 +18,13 @@
             </button>
         </a>
     </div>
-
-    <div class="row mx-2 p-2 category" style="min-width: 900px;">
+    {% if  is_granted('ROLE_EDITOR') %}
+    <div class="row justify-content-between border-bottom py-3 mx-2 ">
+        <input id="commande_ref" type="search" class="form-control category" placeholder="Tapez une référence">
+    </div>
+    {% endif %}
+    <div class="result category"></div>
+    <div class="row mx-2 p-2 category commande_all" style="min-width: 900px;">
         <div class="col-12">
 
             <div class="row justify-content-between px-2 py-1 border-bottom mx-3 ">
@@ -35,9 +40,7 @@
                 <div class="col-2 pl-0">
                 </div>
             </div>
-            <div class="row justify-content-between border-bottom py-3 mx-2 ">
-                <input type="search" class="form-control" placeholder="Tapez une référence">
-            </div>
+        
             {% for commande in commandes %}
             {% if (app.user == commande.user) or is_granted('ROLE_EDITOR') %}
             <div class="row justify-content-between px-2 py-1 border-bottom mx-3 {% if (commande.valid == false) %}font-weight-bold {% endif %}">
@@ -78,9 +81,46 @@
             {% endfor %}
         </div>
     </div>
-
-
 </div>
+{% endblock %}
 
-
+{% block javascripts %}
+<script>
+    $('.result').hide();
+    $('#commande_ref').on('keyup', function (e) {
+        
+        if ($('#commande_ref').val() != '') {
+            $('.commande_all').hide();
+            $('.result').show();
+            $.getJSON('commande/'+$('#commande_ref').val(), function (response) {
+                var result = '';
+                for (var i = 0; i < response.data.length; i++) {
+                    result +=
+                    '<div class="row justify-content-between px-2 py-1 border-bottom mx-3">'+
+                        '<div class="col-2 pl-0 align-self-center">'+
+                            '<span>'+response.data[i].ref+'</span>'+
+                        '</div>'+
+                        '<div class="col-6 pl-0 align-self-center">'+
+                            '<span>'+response.data[i].user+'</span>'+
+                        '</div>'+
+                        '<div class="col-2 pl-0 align-self-center">'+
+                            '<span>'+response.data[i].date+'</span>'+
+                        '</div>'+
+                        '<a href="commande/ma-commande/' + response.data[i].id +'">'+
+                            '<button class="btn pr-0 btnmdsup"><i class="far fa-eye"></i></button>'+
+                        '</a>'+
+                    '</div>'
+                };
+                console.log(response.data);
+                $('.result').html(result);
+        
+            });
+        }else
+        {
+            $('.commande_all').show();
+            $('.result').hide();
+        };
+        
+    });
+</script>
 {% endblock %}

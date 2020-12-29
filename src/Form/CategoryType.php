@@ -4,11 +4,12 @@ namespace App\Form;
 
 use App\Entity\Category;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class CategoryType extends AbstractType
 {
@@ -28,6 +29,10 @@ class CategoryType extends AbstractType
                 'accept'=>'.png', 
                 'placeholder'=>'Ex: image.png', 
             ],
+            'required'=> false,
+        ])
+        ->add('description',HiddenType::class,[
+            'mapped'=> false,
             'required'=> false,
         ])
         ;

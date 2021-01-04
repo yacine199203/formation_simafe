@@ -20,7 +20,7 @@
     </div>
     {% if  is_granted('ROLE_EDITOR') %}
     <div class="row justify-content-between border-bottom py-3 mx-2 ">
-        <input id="commande_ref" type="search" class="form-control category" placeholder="Tapez une référence">
+        <input id="commande_ref" type="text" class="form-control category" placeholder="Tapez une référence">
     </div>
     {% endif %}
     <div class="result category"></div>
@@ -94,7 +94,15 @@
             $('.result').show();
             $.getJSON('commande/'+$('#commande_ref').val(), function (response) {
                 var result = '';
+                var valider ='';
                 for (var i = 0; i < response.data.length; i++) {
+                    if(!response.data[i].valid){
+                        valider= '<a href="/commande/valider/'+response.data[i].id+'">'+
+                            '<button class="btn pr-0 btnmdsup ">Valider</button>'+
+                        '</a>'
+                    }else{
+                        valider=''
+                    }
                     result +=
                     '<div class="row justify-content-between px-2 py-1 border-bottom mx-3">'+
                         '<div class="col-2 pl-0 align-self-center">'+
@@ -106,9 +114,12 @@
                         '<div class="col-2 pl-0 align-self-center">'+
                             '<span>'+response.data[i].date+'</span>'+
                         '</div>'+
+                        '<div class="col-2 pl-0 align-self-center">'+
                         '<a href="commande/ma-commande/' + response.data[i].id +'">'+
                             '<button class="btn pr-0 btnmdsup"><i class="far fa-eye"></i></button>'+
                         '</a>'+
+                        valider+
+                        '</div>'+
                     '</div>'
                 };
                 console.log(response.data);
